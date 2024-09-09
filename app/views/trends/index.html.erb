@@ -1,0 +1,15 @@
+<h1>Fetch Google Trends Data</h1>
+
+<%= form_with url: trends_fetch_path, method: :post do %>
+  <div>
+    <label>Search Query:</label>
+    <%= text_field_tag :query, nil, placeholder: "Enter search query (e.g., star wars)" %>
+  </div>
+  <div>
+    <%= submit_tag "Fetch Trends" %>
+  </div>
+<% end %>
+
+<% if flash[:notice] %>
+  <p><%= flash[:notice] %></p>
+<% end %>
