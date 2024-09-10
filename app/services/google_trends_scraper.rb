@@ -31,7 +31,7 @@ class GoogleTrendsScraper
   end
 
   def parse_trends_page(html)
-    doc = Nokogiri::HTML(html)
+    doc = Nokogiri::HTML.parse(html)
     data = doc.css('a.progress-label').map do |link|
       {
         id_tag: link.css('.label-text').text.strip,
@@ -49,6 +49,7 @@ class GoogleTrendsScraper
 
   def write_to_csv(data)
     CSV.open("trends_data.csv", "wb") do |csv|
+      # Adding a header row
       csv << ["idTag", "tag", "idType", "articles", "URL"]
       data.each do |entry|
         csv << [entry[:id_tag], entry[:tag], entry[:tag_type], entry[:articles], "https://trends.google.ca#{entry[:href]}"]
