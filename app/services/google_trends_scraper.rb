@@ -39,55 +39,6 @@ class GoogleTrendsScraper
     end
   end
 
-  # def parse_trends_page(html)
-  #   return [] unless html
-
-  #   doc = Nokogiri::HTML.parse(html)
-
-  #   begin
-  #     # Output the HTML for debugging
-  #     puts doc.to_html
-
-  #     # Find the main container
-  #     container = doc.at_css('div.fe-related-queries')
-  #     if container.nil?
-  #       puts "Error: 'div.fe-related-queries' not found in the page."
-  #       return []
-  #     end
-
-  #     # Find the content container within the main container
-  #     content_container = container.at_css('div.fe-atoms-generic-content-container')
-  #     if content_container.nil?
-  #       puts "Error: 'div.fe-atoms-generic-content-container' not found."
-  #       return []
-  #     end
-
-  #     # Extract items
-  #     items = content_container.css('div.item').first(20) # Limit to 20 items
-
-  #     data = items.map do |item|
-  #       link_element = item.at_css('div.progress-label-wrapper a.progress-label')
-  #       link_href = link_element ? link_element['href'] : ''
-
-  #       label_text = item.at_css('div.label-text span')&.text&.strip
-  #       rising_value = item.at_css('div.rising-value')&.text&.strip
-
-  #       {
-  #         link: link_href,
-  #         label_text: label_text,
-  #         rising_value: rising_value
-  #       }
-  #     end
-
-  #     puts "Parsed Data:"
-  #     puts data.inspect
-  #     data
-  #   rescue => e
-  #     puts "Error parsing trends page: #{e.message}"
-  #     []
-  #   end
-  # end
-
   def parse_trends_page(html)
     return [] unless html
 
@@ -95,32 +46,36 @@ class GoogleTrendsScraper
 
     begin
       # Output the HTML for debugging
-      # puts doc.to_html
+      puts doc.to_html
 
       # Find the main container
-      container = doc.at_css('div.interstitial-wrapper')
+      container = doc.at_css('div.fe-related-queries')
       if container.nil?
-        puts "Error: 'div.interstitial-wrapper' not found in the page."
+        puts "Error: 'div.fe-related-queries' not found in the page."
         return []
       end
 
       # Find the content container within the main container
-      content_container = container.at_css('div#main-content')
+      content_container = container.at_css('div.fe-atoms-generic-content-container')
       if content_container.nil?
         puts "Error: 'div.fe-atoms-generic-content-container' not found."
         return []
       end
 
       # Extract items
-      items = content_container.css('div#main-message')
+      items = content_container.css('div.item').first(20) # Limit to 20 items
 
       data = items.map do |item|
-        h1_element = item.at_css('h1')&.text&.strip
-        p_element = item.at_css('p')&.text&.strip
+        link_element = item.at_css('div.progress-label-wrapper a.progress-label')
+        link_href = link_element ? link_element['href'] : ''
+
+        label_text = item.at_css('div.label-text span')&.text&.strip
+        rising_value = item.at_css('div.rising-value')&.text&.strip
 
         {
-          h1: h1_element,
-          p: p_element
+          link: link_href,
+          label_text: label_text,
+          rising_value: rising_value
         }
       end
 
@@ -132,6 +87,51 @@ class GoogleTrendsScraper
       []
     end
   end
+
+  # def parse_trends_page(html)
+  #   return [] unless html
+
+  #   doc = Nokogiri::HTML.parse(html)
+
+  #   begin
+  #     # Output the HTML for debugging
+  #     # puts doc.to_html
+
+  #     # Find the main container
+  #     container = doc.at_css('div.interstitial-wrapper')
+  #     if container.nil?
+  #       puts "Error: 'div.interstitial-wrapper' not found in the page."
+  #       return []
+  #     end
+
+  #     # Find the content container within the main container
+  #     content_container = container.at_css('div#main-content')
+  #     if content_container.nil?
+  #       puts "Error: 'div.fe-atoms-generic-content-container' not found."
+  #       return []
+  #     end
+
+  #     # Extract items
+  #     items = content_container.css('div#main-message')
+
+  #     data = items.map do |item|
+  #       h1_element = item.at_css('h1')&.text&.strip
+  #       p_element = item.at_css('p')&.text&.strip
+
+  #       {
+  #         h1: h1_element,
+  #         p: p_element
+  #       }
+  #     end
+
+  #     puts "Parsed Data:"
+  #     puts data.inspect
+  #     data
+  #   rescue => e
+  #     puts "Error parsing trends page: #{e.message}"
+  #     []
+  #   end
+  # end
 
   def write_to_csv(data)
     begin
@@ -153,15 +153,8 @@ class GoogleTrendsScraper
     data = parse_trends_page(html)
     write_to_csv(data)
   end
-end
 
-# Usage
-proxies = [
-  'http://proxy1:port',
-  'http://proxy2:port',
-  'http://proxy3:port'
-  # Add more proxies here
-]
+end
 
 # scraper = GoogleTrendsScraper.new('technology', proxies)
 # scraper.fetch_and_export_trends
