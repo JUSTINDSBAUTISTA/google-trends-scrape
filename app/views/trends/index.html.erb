@@ -12,4 +12,13 @@
 
 <% if flash[:notice] %>
   <p><%= flash[:notice] %></p>
+
+  <!-- Display download button only if the CSV is generated -->
+  <div>
+    <%= link_to 'Download Trends CSV', '/trends_data.csv', class: 'btn btn-primary', download: 'trends_data.csv' %>
+  </div>
+<% end %>
+
+<% if flash[:alert] %>
+  <p><%= flash[:alert] %></p>
 <% end %>
