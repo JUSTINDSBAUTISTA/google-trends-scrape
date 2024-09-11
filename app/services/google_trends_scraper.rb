@@ -1,10 +1,16 @@
 require 'nokogiri'
 require 'selenium-webdriver'
 require 'csv'
+require 'securerandom'
 
 class GoogleTrendsScraper
-  def initialize(query)
+  def initialize(query, proxies)
     @query = query
+    @proxies = proxies
+  end
+
+  def random_proxy
+    @proxies.sample
   end
 
   def fetch_trends_page
@@ -13,12 +19,16 @@ class GoogleTrendsScraper
       user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
       options.add_argument("user-agent=#{user_agent}")
 
+      # Set proxy
+      proxy = random_proxy
+      options.add_argument("--proxy-server=#{proxy}")
+
       driver = Selenium::WebDriver.for :chrome, options: options
       url = "https://trends.google.ca/trends/explore?q=#{@query}&date=now%201-d&geo=CA&hl=en-GB"
       driver.navigate.to(url)
 
       # Wait for the page to load
-      sleep(15)  # Increase this wait time to at least 15 seconds to avoid rapid requests
+      sleep(120)
 
       html = driver.page_source
       # driver.quit
@@ -28,8 +38,6 @@ class GoogleTrendsScraper
       nil
     end
   end
-
-
 
   def parse_trends_page(html)
     return [] unless html
@@ -102,6 +110,13 @@ class GoogleTrendsScraper
   end
 end
 
-# # Usage
-# scraper = GoogleTrendsScraper.new('technology')
+# Usage
+proxies = [
+  'http://proxy1:port',
+  'http://proxy2:port',
+  'http://proxy3:port'
+  # Add more proxies here
+]
+
+# scraper = GoogleTrendsScraper.new('technology', proxies)
 # scraper.fetch_and_export_trends
