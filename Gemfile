@@ -21,8 +21,7 @@ gem "importmap-rails"
 gem 'httparty'
 gem 'nokogiri'
 gem 'csv'
-
-
+gem 'dotenv-rails', groups: [:development, :test]
 
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem "turbo-rails"

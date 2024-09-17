@@ -5,26 +5,30 @@ class TrendsController < ApplicationController
   def fetch_trends
     query = params[:query]
 
-    # List of proxies with valid random ports
-    proxies = [
-      'http://proxy1.com:8080',
-      'http://proxy2.com:3128',
-      'http://proxy3.com:8888',
-      'http://proxy4.com:1080'
-      # Add more proxies with valid ports as needed
-    ]
+    if query.blank?
+      flash[:alert] = "Query parameter is missing."
+      redirect_to trends_path
+      return
+    end
 
-    # Pass proxies to the scraper
-    scraper = GoogleTrendsScraper.new(query, proxies)
+    email = ENV['GOOGLE_TRENDS_EMAIL']
+    password = ENV['GOOGLE_TRENDS_PASSWORD']
 
-    # Fetch and export trends data
-    scraper.fetch_and_export_trends
+    if email.blank? || password.blank?
+      flash[:alert] = "Google account credentials are missing."
+      redirect_to trends_path
+      return
+    end
 
-    # Notify user that the CSV has been generated
-    flash[:notice] = "Google Trends data has been exported to trends_data.csv"
-    redirect_to trends_path
-  rescue => e
-    flash[:alert] = "An error occurred: #{e.message}"
+    scraper = GoogleTrendsScraper.new(query, email, password)
+
+    begin
+      scraper.fetch_and_export_trends
+      flash[:notice] = "Google Trends data has been exported to trends_data.csv"
+    rescue => e
+      flash[:alert] = "An error occurred: #{e.message}"
+    end
+
     redirect_to trends_path
   end
 end
