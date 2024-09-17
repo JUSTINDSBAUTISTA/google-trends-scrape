@@ -160,7 +160,7 @@ class GoogleTrendsScraper
   end
 
   # Method to write data to a CSV file
-  def write_to_csv(data, filename = "trends_data.csv")
+  def write_to_csv(data, filename = "#{@query}.csv")
     if data.empty?
       puts "No data available to write to the CSV file."
       return
@@ -181,15 +181,18 @@ class GoogleTrendsScraper
     end
   end
   
-
   # Main method to fetch and export trends
-  def fetch_and_export_trends(filename = "trends_data.csv", max_pages = 5)
+  def fetch_and_export_trends(filename = nil, max_pages = 5)
+    # Use @query for the filename if none is provided
+    filename ||= "#{@query}.csv"
+    
     data = fetch_trends_pages(max_pages)
-
+  
     if data.any?
       write_to_csv(data, filename)
     else
       puts "No data found to write to the CSV."
     end
   end
+  
 end
