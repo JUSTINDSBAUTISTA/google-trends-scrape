@@ -1,7 +1,4 @@
 class TrendsController < ApplicationController
-  def index
-  end
-
   def fetch_trends
     query = params[:query]
 
@@ -23,8 +20,10 @@ class TrendsController < ApplicationController
     scraper = GoogleTrendsScraper.new(query, email, password)
 
     begin
-      scraper.fetch_and_export_trends
-      flash[:notice] = "Google Trends data has been exported to trends_data.csv"
+      filename = "#{query}.csv" # Set the filename based on the query
+      scraper.fetch_and_export_trends(filename) # Pass the filename to the scraper
+      flash[:notice] = "Google Trends data has been exported to '#{filename}'"
+      flash[:filename] = filename # Store the filename in flash for later retrieval
     rescue => e
       flash[:alert] = "An error occurred: #{e.message}"
     end
