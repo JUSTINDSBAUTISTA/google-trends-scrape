@@ -7,7 +7,7 @@
 
           <%= form_with url: trends_fetch_path, method: :post, html: { class: 'd-flex flex-column align-items-center' } do %>
             <div class="mb-3 w-100">
-              <%= text_field_tag :query, nil, placeholder: "Enter search query (e.g., star wars)", class: 'form-control form-control-lg' %>
+              <%= text_field_tag :queries, nil, placeholder: "Enter search queries separated by commas (e.g., star wars, philippines, japan)", class: 'form-control form-control-lg' %>
             </div>
             <%= submit_tag "Fetch Trends", class: 'btn btn-primary w-100' %>
           <% end %>
@@ -16,13 +16,17 @@
             <div class="alert alert-info mt-3">
               <%= flash[:notice] %>
 
-              <!-- Display download button only if the CSV is generated -->
-              <% if flash[:filename] && File.exist?(Rails.root.join('public', flash[:filename])) %>
-                <div class="mt-3 text-center">
-                  <%= link_to 'Download Trends CSV', "/#{flash[:filename]}", class: 'btn btn-success', download: flash[:filename] %>
-                </div>
+              <!-- Display download buttons for each CSV file -->
+              <% if flash[:filenames] %>
+                <% flash[:filenames].each do |query, filename| %>
+                  <% if File.exist?(Rails.root.join('public', filename)) %>
+                    <div class="mt-3 text-center">
+                      <%= link_to "Download Trends CSV for '#{query}'", "/#{filename}", class: 'btn btn-success', download: filename %>
+                    </div>
+                  <% end %>
+                <% end %>
               <% else %>
-                <p class="mt-3 text-center">No CSV file available for download.</p>
+                <p class="mt-3 text-center">No CSV files available for download.</p>
               <% end %>
             </div>
           <% end %>
