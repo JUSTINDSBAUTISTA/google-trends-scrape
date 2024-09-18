@@ -19,7 +19,7 @@ class GoogleTrendsScraper
       options.add_argument("user-agent=#{user_agent}")
   
       driver = Selenium::WebDriver.for :chrome, options: options
-      wait = Selenium::WebDriver::Wait.new(timeout: 60) # Increased wait time for 2FA
+      wait = Selenium::WebDriver::Wait.new(timeout: 30) # Increased wait time for 2FA
   
       # Navigate to Google login page
       driver.navigate.to("https://accounts.google.com/signin")
@@ -39,18 +39,18 @@ class GoogleTrendsScraper
   
       # 2FA step
       puts "Please complete 2FA manually in the browser..."
-      sleep(20) # Give time for 2FA
+      sleep(10) # Give time for 2FA
   
       # Navigate to the Trends page
       url = "https://trends.google.ca/trends/explore?q=#{@query}&date=now%207-d&geo=CA&hl=en-GB"
       driver.navigate.to(url)
-  
+      sleep(5 )
       all_data = []
       page_number = 1
   
       while page_number <= max_pages
         # Capture the page's HTML content
-        sleep(5)
+  
         html = driver.page_source
       
         # Parse and collect data from the current page
@@ -84,7 +84,6 @@ class GoogleTrendsScraper
           break
         rescue Selenium::WebDriver::Error::ElementClickInterceptedError
           puts "Element click intercepted, trying to handle overlay or obstruction."
-          sleep(2) # Retry after a short delay
         end
       end
       
@@ -101,7 +100,6 @@ class GoogleTrendsScraper
       nil
     end
   end
-  
   
   # Parse the fetched HTML and extract trends data
   def parse_trends_page(html)
