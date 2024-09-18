@@ -18,7 +18,7 @@ class GoogleTrendsScraper
     options.add_argument("user-agent=#{user_agent}")
 
     driver = Selenium::WebDriver.for :chrome, options: options
-    wait = Selenium::WebDriver::Wait.new(timeout: 30) # Increased wait time for 2FA
+    wait = Selenium::WebDriver::Wait.new(timeout: 20) # Increased wait time for 2FA
 
     # Navigate to Google login page
     driver.navigate.to("https://accounts.google.com/signin")
@@ -36,9 +36,17 @@ class GoogleTrendsScraper
     password_field.send_keys(@password)
     driver.find_element(:id, 'passwordNext').click
 
+    # Wait until the "Continue" button is present and clickable
+    continue_button = wait.until do
+      driver.find_element(xpath: "//button[.//span[text()='Continue']]")
+    end
+
+    # Click the "Continue" button
+    continue_button.click
+
     # 2FA step
     puts "Please complete 2FA manually in the browser..."
-    sleep(20) # Give time for 2FA
+    sleep(10) # Give time for 2FA
 
     # Navigate to the Trends page
     url = "https://trends.google.ca/trends/explore?q=#{@query}&date=now%207-d&geo=CA&hl=en-GB"
