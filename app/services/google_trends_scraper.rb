@@ -151,6 +151,32 @@ class GoogleTrendsScraper
     end
   end
 
+  # Method to append data to a combined CSV file
+  def append_to_combined_csv(data)
+    if data.empty?
+      puts "No data available to append to the combined CSV file."
+      return
+    end
+
+    combined_filename = 'all_trends_data.csv' # Name of the combined CSV file
+    filepath = Rails.root.join('public', combined_filename) # Save file in the public directory
+
+    begin
+      CSV.open(filepath, "a+") do |csv|
+        if csv.count.zero?
+          # Add headers only if the file is empty (newly created)
+          csv << ["Line Number", "Label Text", "Link", "Rising Value"]
+        end
+        data.each do |entry|
+          csv << [entry[:line_number], entry[:label_text], "https://trends.google.ca#{entry[:link]}", entry[:rising_value]]
+        end
+      end
+      puts "CSV file 'all_trends_data.csv' updated successfully."
+    rescue => e
+      puts "Error writing to combined CSV file 'all_trends_data.csv': #{e.message}"
+    end
+  end
+
   # Method to write data to a CSV file
   def write_to_csv(data, filename = "#{@query.parameterize}.csv")
     if data.empty?
@@ -162,9 +188,9 @@ class GoogleTrendsScraper
 
     begin
       CSV.open(filepath, "wb") do |csv|
-        csv << ["Link", "Label Text", "Rising Value", "Line Number"]
+        csv << ["Line Number", "Label Text", "Link", "Rising Value"]
         data.each do |entry|
-          csv << ["https://trends.google.ca#{entry[:link]}", entry[:label_text], entry[:rising_value], entry[:line_number]]
+          csv << [entry[:line_number], entry[:label_text], "https://trends.google.ca#{entry[:link]}", entry[:rising_value]]
         end
       end
       puts "CSV file '#{filename}' written successfully."
@@ -173,6 +199,8 @@ class GoogleTrendsScraper
     end
   end
 
+
+
   # Main method to fetch and export trends
   def fetch_and_export_trends(filename = nil, max_pages = 5)
     filename ||= "#{@query.parameterize}.csv"
@@ -180,7 +208,8 @@ class GoogleTrendsScraper
     data = fetch_trends_pages(max_pages)
 
     if data.any?
-      write_to_csv(data, filename)
+      write_to_csv(data, filename)      # Save individual query data to separate CSV
+      append_to_combined_csv(data)      # Append data to the combined CSV
     else
       puts "No data found to write to the CSV."
     end
