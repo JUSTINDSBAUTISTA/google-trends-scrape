@@ -5,6 +5,13 @@
         <div class="card-body">
           <h1 class="card-title text-center mb-4">Fetch Google Trends Data</h1>
 
+          <div class="text-right mb-3">
+            <% combined_file = Rails.root.join('public', 'all_trends_data.csv') %>
+            <% if File.exist?(combined_file) %>
+              <%= link_to "Download All Trends Data", "/all_trends_data.csv", class: 'btn btn-link', download: "all_trends_data.csv" %>
+            <% end %>
+          </div>
+
           <%= form_with url: trends_fetch_path, method: :post, html: { class: 'd-flex flex-column align-items-center' } do %>
             <div class="mb-3 w-100">
               <%= text_field_tag :queries, nil, placeholder: "Enter search queries separated by commas (e.g., star wars, philippines, japan)", class: 'form-control form-control-lg' %>
