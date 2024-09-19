@@ -3,70 +3,99 @@ require 'selenium-webdriver'
 require 'csv'
 require 'net/http'
 require 'uri'
-
 class GoogleTrendsScraper
-  def initialize(query, email, password)
-    @query = query
-    @email = email
+  def initialize(email, password)
+    @username = email
     @password = password
+    @driver = nil
+    @wait = nil
   end
 
-  # Fetch the Google Trends page after logging in with pagination
-  def fetch_trends_pages(max_pages = 5)
-    options = Selenium::WebDriver::Chrome::Options.new
-    user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36'
-    options.add_argument("user-agent=#{user_agent}")
-
-    driver = Selenium::WebDriver.for :chrome, options: options
-    wait = Selenium::WebDriver::Wait.new(timeout: 20) # Increased wait time for 2FA
-
-    # Navigate to Google login page
+  def login_to_google(driver, wait)
     driver.navigate.to("https://accounts.google.com/signin")
-
+  
     # Enter email
     email_field = wait.until { driver.find_element(:id, 'identifierId') }
-    email_field.send_keys(@email)
+    email_field.send_keys(@username)
     driver.find_element(:id, 'identifierNext').click
-
+  
     # Wait for the password field to appear
     wait.until { driver.find_element(:name, 'Passwd').displayed? }
-
+  
     # Enter password
     password_field = driver.find_element(:name, 'Passwd')
     password_field.send_keys(@password)
     driver.find_element(:id, 'passwordNext').click
-
-    # Wait until the "Continue" button is present and clickable
+  
+    # Wait for the "Continue" button is present and clickable
     continue_button = wait.until do
-      driver.find_element(xpath: "//button[.//span[text()='Continue']]")
+      element = driver.find_element(xpath: "//button[.//span[text()='Continue']]")
+      element if element.displayed? # Ensure the element is displayed
     end
-
+    
     # Click the "Continue" button
     continue_button.click
 
     # 2FA step
     puts "Please complete 2FA manually in the browser..."
     sleep(10) # Give time for 2FA
+  end  
 
-    # Navigate to the Trends page
-    url = "https://trends.google.ca/trends/explore?q=#{@query}&date=now%207-d&geo=CA&hl=en-GB"
-    driver.navigate.to(url)
-    sleep(5)
+  # Fetch the Google Trends page after logging in with pagination
+  def fetch_trends_pages(driver, wait, query, max_pages = 5)
+    # Navigate to the Trends page with Accept-Language set
+    driver.navigate.to("https://trends.google.com/trends/explore?q=#{query}&date=now%207-d&geo=CA&hl=en")
+  
+    # Wait for the page to load completely
+    wait.until { driver.execute_script("return document.readyState") == "complete" }
+  
+    # Wait for the input element to be present and visible
+    begin
+      input_element = wait.until do
+        element = driver.find_element(xpath: '//input[@type="search"]')
+        element if element.displayed? && element.enabled?
+      end
+    rescue Selenium::WebDriver::Error::TimeoutError
+      puts "Timeout while waiting for the input element. Check if the page is loaded properly and the element exists."
+      driver.quit
+      return []
+    end
+  
+    # Scroll the input element into view
+    driver.execute_script("arguments[0].scrollIntoView(true);", input_element)
+  
+    # Clear the input field and enter the query
+    input_element.clear
+    input_element.send_keys(query)
+  
+    # Simulate pressing Enter to submit the query
+    input_element.send_keys(:enter)
+  
+    # Wait for the search results to load
+    begin
+      wait.until { driver.execute_script("return document.readyState") == "complete" }
+      sleep(6)
+    rescue Selenium::WebDriver::Error::TimeoutError
+      puts "Timeout while waiting for the page to load after entering the query."
+      driver.quit
+      return []
+    end
+  
     all_data = []
     page_number = 1
-
+  
     while page_number <= max_pages
       # Capture the page's HTML content
       html = driver.page_source
       page_data = parse_trends_page(html)
       all_data.concat(page_data)
-
+  
       begin
         next_buttons = driver.find_elements(css: 'button[aria-label="Next"]')
-
+  
         if next_buttons.any?
           next_button = next_buttons.last
-
+  
           if next_button.displayed? && next_button.enabled?
             driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
             wait.until { next_button.displayed? && next_button.enabled? }
@@ -86,22 +115,14 @@ class GoogleTrendsScraper
         break
       rescue Selenium::WebDriver::Error::ElementClickInterceptedError
         puts "Element click intercepted, trying to handle overlay or obstruction."
+        sleep(1) # Optional: Adjust sleep time if needed
       end
     end
-
-    driver.quit
+  
     all_data
-
-  rescue Selenium::WebDriver::Error::TimeoutError => e
-    puts "Error: Operation timed out. Make sure you've completed the 2FA: #{e.message}"
-    driver.quit if driver
-    nil
-  rescue => e
-    puts "An error occurred: #{e.message}"
-    driver.quit if driver
-    nil
   end
-
+  
+  
   # Parse the fetched HTML and extract trends data
   def parse_trends_page(html)
     return [] unless html
@@ -168,7 +189,7 @@ class GoogleTrendsScraper
           csv << ["Line Number", "Label Text", "Link", "Rising Value"]
         end
         data.each do |entry|
-          csv << [entry[:line_number], entry[:label_text], "https://trends.google.ca#{entry[:link]}", entry[:rising_value]]
+          csv << [entry[:line_number], entry[:label_text].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value]]
         end
       end
       puts "CSV file 'all_trends_data.csv' updated successfully."
@@ -190,7 +211,7 @@ class GoogleTrendsScraper
       CSV.open(filepath, "wb") do |csv|
         csv << ["Line Number", "Label Text", "Link", "Rising Value"]
         data.each do |entry|
-          csv << [entry[:line_number], entry[:label_text], "https://trends.google.ca#{entry[:link]}", entry[:rising_value]]
+          csv << [entry[:line_number], entry[:label_text].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value]]
         end
       end
       puts "CSV file '#{filename}' written successfully."
@@ -199,19 +220,30 @@ class GoogleTrendsScraper
     end
   end
 
-
-
   # Main method to fetch and export trends
-  def fetch_and_export_trends(filename = nil, max_pages = 5)
-    filename ||= "#{@query.parameterize}.csv"
-    
-    data = fetch_trends_pages(max_pages)
-
-    if data.any?
-      write_to_csv(data, filename)      # Save individual query data to separate CSV
-      append_to_combined_csv(data)      # Append data to the combined CSV
-    else
-      puts "No data found to write to the CSV."
+  def fetch_and_export_trends(queries, max_pages = 5)
+    options = Selenium::WebDriver::Chrome::Options.new
+    user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36'
+    options.add_argument("user-agent=#{user_agent}")
+  
+    @driver = Selenium::WebDriver.for :chrome, options: options
+    @wait = Selenium::WebDriver::Wait.new(timeout: 20)
+  
+    login_to_google(@driver, @wait)
+  
+    queries.each do |query|
+      filename ||= "#{query.parameterize}.csv"
+      data = fetch_trends_pages(@driver, @wait, query, max_pages)
+  
+      if data.any?
+        write_to_csv(data, filename)      # Save individual query data to separate CSV
+        append_to_combined_csv(data)      # Append data to the combined CSV
+      else
+        puts "No data found to write to the CSV for query: #{query}."
+      end
     end
-  end
+  
+    @driver.quit
+  end  
+  
 end
