@@ -30,9 +30,10 @@ class GoogleTrendsScraper
   
     # Wait for the "Continue" button is present and clickable
     continue_button = wait.until do
-      driver.find_element(xpath: "//button[.//span[text()='Continue']]")
+      element = driver.find_element(xpath: "//button[.//span[text()='Continue']]")
+      element if element.displayed? # Ensure the element is displayed
     end
-
+    
     # Click the "Continue" button
     continue_button.click
 
@@ -44,7 +45,7 @@ class GoogleTrendsScraper
   # Fetch the Google Trends page after logging in with pagination
   def fetch_trends_pages(driver, wait, query, max_pages = 5)
     # Navigate to the Trends page
-    driver.navigate.to("https://trends.google.com/trends/explore?q=#{query}&date=now%207-d&geo=CA&hl=en-US")
+    driver.navigate.to("https://trends.google.com/trends/explore?date=now%201-d&geo=CA&q=#{query}&hl=en")
   
     # Wait for the page to load completely
     wait.until { driver.execute_script("return document.readyState") == "complete" }
@@ -74,7 +75,7 @@ class GoogleTrendsScraper
     # Wait for the search results to load
     begin
       wait.until { driver.execute_script("return document.readyState") == "complete" }
-      sleep(5) # Optional: Adjust sleep time as needed for the page to fully load
+      sleep(3) # Optional: Adjust sleep time as needed for the page to fully load
     rescue Selenium::WebDriver::Error::TimeoutError
       puts "Timeout while waiting for the page to load after entering the query."
       driver.quit

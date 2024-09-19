@@ -1,7 +1,7 @@
 class TrendsController < ApplicationController
   def fetch_trends
     queries = params[:queries].to_s.split(',').map(&:strip)
-  
+    puts "Queries count: #{queries.size}"
     if queries.empty?
       flash[:alert] = "Queries parameter is missing."
       redirect_to trends_path
