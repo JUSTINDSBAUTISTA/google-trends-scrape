@@ -3,7 +3,6 @@ require 'selenium-webdriver'
 require 'csv'
 require 'net/http'
 require 'uri'
-
 class GoogleTrendsScraper
   def initialize(email, password)
     @username = email
@@ -45,7 +44,7 @@ class GoogleTrendsScraper
   # Fetch the Google Trends page after logging in with pagination
   def fetch_trends_pages(driver, wait, query, max_pages = 5)
     # Navigate to the Trends page
-    driver.navigate.to("https://trends.google.com/trends/explore?date=now%201-d&geo=CA&q=#{query}&hl=en")
+    driver.navigate.to("https://trends.google.com/trends/explore?date=today%203-m&geo=CA&q=#{query}&hl=en")
   
     # Wait for the page to load completely
     wait.until { driver.execute_script("return document.readyState") == "complete" }
@@ -75,7 +74,7 @@ class GoogleTrendsScraper
     # Wait for the search results to load
     begin
       wait.until { driver.execute_script("return document.readyState") == "complete" }
-      sleep(3) # Optional: Adjust sleep time as needed for the page to fully load
+      sleep(4)
     rescue Selenium::WebDriver::Error::TimeoutError
       puts "Timeout while waiting for the page to load after entering the query."
       driver.quit
@@ -221,12 +220,10 @@ class GoogleTrendsScraper
     end
   end
 
-
-
   # Main method to fetch and export trends
   def fetch_and_export_trends(queries, max_pages = 5)
     options = Selenium::WebDriver::Chrome::Options.new
-    user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36'
+    user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36'
     options.add_argument("user-agent=#{user_agent}")
   
     @driver = Selenium::WebDriver.for :chrome, options: options
