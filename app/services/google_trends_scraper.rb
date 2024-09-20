@@ -44,7 +44,7 @@ class GoogleTrendsScraper
   # Fetch the Google Trends page after logging in with pagination
   def fetch_trends_pages(driver, wait, query, max_pages = 5)
     # Navigate to the Trends page with Accept-Language set
-    driver.navigate.to("https://trends.google.com/trends/explore?q=#{query}&date=now%207-d&geo=CA&hl=en")
+    driver.navigate.to("https://trends.google.com/trends/explore?q=#{query}&date=now%201-d&geo=CA&hl=en-US")
   
     # Wait for the page to load completely
     wait.until { driver.execute_script("return document.readyState") == "complete" }
@@ -74,7 +74,7 @@ class GoogleTrendsScraper
     # Wait for the search results to load
     begin
       wait.until { driver.execute_script("return document.readyState") == "complete" }
-      sleep(6)
+      sleep(2.5)
     rescue Selenium::WebDriver::Error::TimeoutError
       puts "Timeout while waiting for the page to load after entering the query."
       driver.quit
