@@ -74,7 +74,7 @@ class GoogleTrendsScraper
     # Wait for the search results to load
     begin
       wait.until { driver.execute_script("return document.readyState") == "complete" }
-      sleep(2.5)
+      sleep(2)
     rescue Selenium::WebDriver::Error::TimeoutError
       puts "Timeout while waiting for the page to load after entering the query."
       driver.quit
