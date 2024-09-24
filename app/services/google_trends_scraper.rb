@@ -74,7 +74,7 @@ class GoogleTrendsScraper
     # Wait for the search results to load
     begin
       wait.until { driver.execute_script("return document.readyState") == "complete" }
-      sleep(2)
+      sleep(2.5)
     rescue Selenium::WebDriver::Error::TimeoutError
       puts "Timeout while waiting for the page to load after entering the query."
       driver.quit
@@ -93,7 +93,7 @@ class GoogleTrendsScraper
       begin
         next_buttons = driver.find_elements(css: 'button[aria-label="Next"]')
   
-        if next_buttons.any?
+        if next_buttons.any? && next_buttons.last.displayed?
           next_button = next_buttons.last
   
           if next_button.displayed? && next_button.enabled?
@@ -114,8 +114,7 @@ class GoogleTrendsScraper
         puts "No 'Next' button found, ending pagination."
         break
       rescue Selenium::WebDriver::Error::ElementClickInterceptedError
-        puts "Element click intercepted, trying to handle overlay or obstruction."
-        sleep(1) # Optional: Adjust sleep time if needed
+        puts "Element click intercepted, trying to handle overlay or obstruction."# Optional: Adjust sleep time if needed
       end
     end
   
