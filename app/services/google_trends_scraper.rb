@@ -17,7 +17,7 @@ class GoogleTrendsScraper
 
     # Wait for the page to load completely
     wait.until { driver.execute_script("return document.readyState") == "complete" }
-
+    sleep(rand(2..3))
     all_data = []
     page_number = 1
     total_item_number = 1  # To keep track of global line numbers
@@ -28,7 +28,6 @@ class GoogleTrendsScraper
 
       # Scrape the data from the current page
       html = driver.page_source
-      sleep(rand(2..3))
       page_data = parse_trends_page(html)
 
       # Ensure that data from the current page is unique and non-empty
@@ -72,7 +71,6 @@ class GoogleTrendsScraper
         break
       rescue Selenium::WebDriver::Error::ElementClickInterceptedError
         puts "Element click intercepted, trying to handle overlay or obstruction."
-        sleep(1)
       end
     end
 
