@@ -3,12 +3,37 @@ require 'selenium-webdriver'
 require 'csv'
 require 'net/http'
 require 'uri'
+require 'zip'
 
 class GoogleTrendsScraper
   def initialize
     @driver = nil
     @wait = nil
     @first_reload_done = false # Initialize flag to track the first reload
+  end
+
+  def create_zip_from_csv_files(queries)
+    zipfile_name = Rails.root.join('public', 'trends_data.zip')
+
+    begin
+      Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
+        queries.each do |query|
+          filename = "#{query.parameterize}.csv"
+          csv_filepath = Rails.root.join('public', filename)
+
+          # Only include the CSV file if it exists
+          if File.exist?(csv_filepath)
+            zipfile.add(filename, csv_filepath)
+          else
+            puts "File not found for query: #{query}, skipping."
+          end
+        end
+      end
+
+      puts "ZIP file 'trends_data.zip' created successfully."
+    rescue => e
+      puts "Error creating ZIP file: #{e.message}"
+    end
   end
 
   # Fetch the Google Trends page with pagination logic
@@ -146,7 +171,7 @@ class GoogleTrendsScraper
   end
 
   # Method to append data to a combined CSV file
-  def append_to_combined_csv(data)
+  def append_to_combined_csv(data, query)
     if data.empty?
       puts "No data available to append to the combined CSV file."
       return
@@ -154,15 +179,16 @@ class GoogleTrendsScraper
 
     combined_filename = 'all_trends_data.csv' # Name of the combined CSV file
     filepath = Rails.root.join('public', combined_filename) # Save file in the public directory
+    current_date = Date.today.strftime('%Y-%m-%d') # Get current date in YYYY-MM-DD format
 
     begin
       CSV.open(filepath, "a+") do |csv|
         if csv.count.zero?
           # Add headers only if the file is empty (newly created)
-          csv << ["Line Number", "Label Text", "Link", "Rising Value"]
+          csv << ["Query", "Line Number", "Label Text", "Link", "Rising Value", "Date"] # Add "Date" column
         end
         data.each do |entry|
-          csv << [entry[:line_number], entry[:label_text].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value]]
+          csv << [query, entry[:line_number], entry[:label_text].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
         end
       end
       puts "CSV file 'all_trends_data.csv' updated successfully."
@@ -172,19 +198,20 @@ class GoogleTrendsScraper
   end
 
   # Method to write data to a CSV file
-  def write_to_csv(data, filename)
+  def write_to_csv(data, filename, query)
     if data.empty?
       puts "No data available to write to the CSV file."
       return
     end
 
     filepath = Rails.root.join('public', filename) # Save file in the public directory
+    current_date = Date.today.strftime('%Y-%m-%d') # Get current date in YYYY-MM-DD format
 
     begin
       CSV.open(filepath, "wb") do |csv|
-        csv << ["Line Number", "Label Text", "Link", "Rising Value"]
+        csv << ["Query", "Line Number", "Label Text", "Link", "Rising Value", "Date"] # Add "Date" column
         data.each do |entry|
-          csv << [entry[:line_number], entry[:label_text].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value]]
+          csv << [query, entry[:line_number], entry[:label_text].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
         end
       end
       puts "CSV file '#{filename}' written successfully."
@@ -198,42 +225,44 @@ class GoogleTrendsScraper
     options = Selenium::WebDriver::Chrome::Options.new
     user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36'
     options.add_argument("user-agent=#{user_agent}")
-    
+
     @driver = Selenium::WebDriver.for :chrome, options: options
     @wait = Selenium::WebDriver::Wait.new(timeout: 20)
-  
-    # Loop through the queries in randomized batches of 3 to 5
+
+    # Process the queries in batches and write CSV files
     queries.each_slice(rand(3..5)).with_index do |query_batch, index|
       query_batch.each do |query|
         filename = "#{query.parameterize}.csv"
         data = fetch_trends_pages(@driver, @wait, query, max_pages)
-  
+
         if data.any?
-          write_to_csv(data, filename)      # Save individual query data to separate CSV
-          append_to_combined_csv(data)      # Append data to the combined CSV
+          write_to_csv(data, filename, query)        # Pass the query to the write_to_csv method
+          append_to_combined_csv(data, query)        # Pass the query to the append_to_combined_csv method
         else
           puts "No data found to write to the CSV for query: #{query}."
         end
       end
-  
-      # After processing the randomized batch of queries, open a new tab and close the old one
+
       if (index + 1) < (queries.size / query_batch.size.to_f).ceil
         @driver.execute_script("window.open('about:blank', '_blank');")
         new_tab_handle = @driver.window_handles.last
         old_tab_handle = @driver.window_handles.first
-  
+
         @driver.switch_to.window(new_tab_handle)
-  
+
         if old_tab_handle != new_tab_handle
           @driver.switch_to.window(old_tab_handle)
           @driver.close
         end
-  
+
         @driver.switch_to.window(new_tab_handle)
       end
     end
-  
+
     @driver.quit
+
+    # Create a ZIP file with all the generated CSV files
+    create_zip_from_csv_files(queries)
   end
-  
+
 end

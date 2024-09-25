@@ -13,6 +13,14 @@
             <% end %>
           </div>
 
+          <!-- Link to Download ZIP File -->
+          <div class="text-right mb-3">
+            <% zip_file = Rails.root.join('public', 'trends_data.zip') %>
+            <% if File.exist?(zip_file) %>
+              <%= link_to "Download All CSVs as ZIP", "/trends_data.zip", class: 'btn btn-link', download: "trends_data.zip" %>
+            <% end %>
+          </div>
+
           <!-- Form for Fetching Google Trends Data -->
           <%= form_with url: fetch_trends_trends_path, method: :post, local: true, class: 'form' do |form| %>
             <div class="mb-3">

@@ -1,6 +1,6 @@
 class TrendsController < ApplicationController
   def index
-    # Display form and existing CSV files if necessary
+    # Display form and existing CSV/ZIP files if necessary
   end
 
   def fetch_trends
@@ -16,6 +16,16 @@ class TrendsController < ApplicationController
     rescue => e
       flash[:alert] = "An error occurred: #{e.message}"
     ensure
+      redirect_to trends_path
+    end
+  end
+
+  def download_zip
+    zip_file = Rails.root.join('public', 'trends_data.zip')
+    if File.exist?(zip_file)
+      send_file(zip_file, type: 'application/zip', filename: 'trends_data.zip', disposition: 'attachment')
+    else
+      flash[:alert] = "ZIP file not found."
       redirect_to trends_path
     end
   end
