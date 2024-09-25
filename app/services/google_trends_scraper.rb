@@ -153,12 +153,12 @@ class GoogleTrendsScraper
         link_element = item.at_css('div.progress-label-wrapper a.progress-label')
         link_href = link_element ? link_element['href'] : ''
 
-        label_text = item.at_css('div.label-text span')&.text&.strip
+        seed = item.at_css('div.label-text span')&.text&.strip
         rising_value = item.at_css('div.rising-value')&.text&.strip
 
         {
           link: link_href,
-          label_text: label_text,
+          seed: seed,
           rising_value: rising_value
         }
       end
@@ -185,10 +185,10 @@ class GoogleTrendsScraper
       CSV.open(filepath, "a+") do |csv|
         if csv.count.zero?
           # Add headers only if the file is empty (newly created)
-          csv << ["Query", "Line Number", "Label Text", "Link", "Rising Value", "Date"] # Add "Date" column
+          csv << ["Query", "Line Number", "Seed", "Link", "Rising Value", "Date"] # Add "Date" column
         end
         data.each do |entry|
-          csv << [query, entry[:line_number], entry[:label_text].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
+          csv << [query, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
         end
       end
       puts "CSV file 'all_trends_data.csv' updated successfully."
@@ -209,9 +209,9 @@ class GoogleTrendsScraper
 
     begin
       CSV.open(filepath, "wb") do |csv|
-        csv << ["Query", "Line Number", "Label Text", "Link", "Rising Value", "Date"] # Add "Date" column
+        csv << ["Query", "Line Number", "Seed", "Link", "Rising Value", "Date"] # Add "Date" column
         data.each do |entry|
-          csv << [query, entry[:line_number], entry[:label_text].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
+          csv << [query, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
         end
       end
       puts "CSV file '#{filename}' written successfully."
@@ -219,6 +219,7 @@ class GoogleTrendsScraper
       puts "Error writing CSV file '#{filename}': #{e.message}"
     end
   end
+
 
   # Main method to fetch and export trends
   def fetch_and_export_trends(queries, max_pages = 5)
