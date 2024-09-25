@@ -28,7 +28,7 @@ class GoogleTrendsScraper
 
       # Scrape the data from the current page
       html = driver.page_source
-      sleep(rand(3..4))
+      sleep(rand(2..3))
       page_data = parse_trends_page(html)
 
       # Ensure that data from the current page is unique and non-empty
@@ -72,7 +72,7 @@ class GoogleTrendsScraper
         break
       rescue Selenium::WebDriver::Error::ElementClickInterceptedError
         puts "Element click intercepted, trying to handle overlay or obstruction."
-        sleep(1) # Optional: Adjust sleep time if needed
+        sleep(1)
       end
     end
 
@@ -82,7 +82,7 @@ class GoogleTrendsScraper
   # Scroll down the page until no new content appears
   def scroll_down_until_no_new_content(driver)
     previous_height = driver.execute_script("return document.body.scrollHeight")
-    max_scroll_attempts = 5  # Limit scroll attempts to prevent infinite loop
+    max_scroll_attempts = 2  # Limit scroll attempts to prevent infinite loop
     scroll_attempts = 0
 
     while scroll_attempts < max_scroll_attempts
@@ -203,12 +203,13 @@ class GoogleTrendsScraper
     
     @driver = Selenium::WebDriver.for :chrome, options: options
     @wait = Selenium::WebDriver::Wait.new(timeout: 20)
-
-    queries.each_slice(5).with_index do |query_batch, index|
+  
+    # Loop through the queries in randomized batches of 3 to 5
+    queries.each_slice(rand(3..5)).with_index do |query_batch, index|
       query_batch.each do |query|
         filename = "#{query.parameterize}.csv"
         data = fetch_trends_pages(@driver, @wait, query, max_pages)
-
+  
         if data.any?
           write_to_csv(data, filename)      # Save individual query data to separate CSV
           append_to_combined_csv(data)      # Append data to the combined CSV
@@ -216,24 +217,25 @@ class GoogleTrendsScraper
           puts "No data found to write to the CSV for query: #{query}."
         end
       end
-
-      # After processing 5 queries, open a new tab and close the old one safely
-      if (index + 1) < (queries.size / 5.0).ceil
+  
+      # After processing the randomized batch of queries, open a new tab and close the old one
+      if (index + 1) < (queries.size / query_batch.size.to_f).ceil
         @driver.execute_script("window.open('about:blank', '_blank');")
         new_tab_handle = @driver.window_handles.last
         old_tab_handle = @driver.window_handles.first
-
+  
         @driver.switch_to.window(new_tab_handle)
-
+  
         if old_tab_handle != new_tab_handle
           @driver.switch_to.window(old_tab_handle)
           @driver.close
         end
-
+  
         @driver.switch_to.window(new_tab_handle)
       end
     end
-
+  
     @driver.quit
   end
+  
 end
