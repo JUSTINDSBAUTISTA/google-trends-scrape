@@ -211,7 +211,7 @@ class GoogleTrendsScraper
           csv << ["Query", "Line Number", "Seed", "Link", "Rising Value", "Date"] # Add "Date" column
         end
         data.each do |entry|
-          csv << [query, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
+          csv << [query.upcase, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
         end
       end
       puts "[append_to_combined_csv] CSV file 'all_trends_data.csv' updated successfully."
@@ -234,7 +234,7 @@ class GoogleTrendsScraper
       CSV.open(filepath, "wb") do |csv|
         csv << ["Query", "Line Number", "Seed", "Link", "Rising Value", "Date"] # Add "Date" column
         data.each do |entry|
-          csv << [query, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
+          csv << [query.upcase, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
         end
       end
       puts "[write_to_csv] CSV file '#{filename}' written successfully."
