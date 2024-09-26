@@ -42,15 +42,14 @@ class GoogleTrendsScraper
 
     # Wait for the page to load completely
     wait.until { driver.execute_script("return document.readyState") == "complete" }
-    sleep(rand(2..3))
+    sleep(rand(2.0..3.0))
     all_data = []
     page_number = 1
     total_item_number = 1  # To keep track of global line numbers
 
+    # Ensure the page is scrolled to load all content
+    scroll_down_until_no_new_content(driver)
     while page_number <= max_pages
-      # Ensure the page is scrolled to load all content
-      scroll_down_until_no_new_content(driver)
-
       # Scrape the data from the current page
       html = driver.page_source
       page_data = parse_trends_page(html)
@@ -111,7 +110,7 @@ class GoogleTrendsScraper
     while scroll_attempts < max_scroll_attempts
       # Scroll to the bottom of the page
       driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-      sleep(3) # Give time for lazy-loaded content to load
+      sleep(rand(2.0..3.0)) # Give time for lazy-loaded content to load
 
       new_height = driver.execute_script("return document.body.scrollHeight")
       if new_height == previous_height
@@ -129,10 +128,6 @@ class GoogleTrendsScraper
     doc = Nokogiri::HTML.parse(html)
   
     begin
-      # Find all containers related to the Google Trends page content
-      containers = doc.css('div.fe-atoms-generic-content-container')
-      puts "Found #{containers.size} 'div.fe-atoms-generic-content-container' containers"
-  
       # Now specifically target the container that contains "Related queries"
       related_queries_header = doc.at_css('div.fe-atoms-generic-title:contains("Related queries")')
   
@@ -140,7 +135,11 @@ class GoogleTrendsScraper
         puts "Related queries header not found. Skipping this query."
         return []
       end
-  
+
+      # Find all containers related to the Google Trends page content
+      containers = doc.css('div.fe-atoms-generic-content-container')
+      puts "Found #{containers.size} 'div.fe-atoms-generic-content-container' containers"
+    
       # From the related queries header, get the closest ancestor with the desired class
       related_queries_container = related_queries_header.ancestors('div.fe-atoms-generic-container').first
   
