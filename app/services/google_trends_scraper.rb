@@ -38,7 +38,7 @@ class GoogleTrendsScraper
       puts "\n"
       puts "ZIP file 'trends_data.zip' created successfully."
     rescue => e
-      puts "Error creating ZIP file: #{e.message}"
+      puts "Error creating ZIP file: #{e.messffage}"
     end
   end
 
@@ -139,43 +139,36 @@ class GoogleTrendsScraper
     doc = Nokogiri::HTML.parse(html)
   
     begin
-      # Find all 'fe-related-queries.fe-atoms-generic-container' containers
-      related_queries_containers = doc.css('div.fe-related-queries.fe-atoms-generic-container')
-      
-      # Ensure we have at least 3 such containers, and target the 3rd one
-      if related_queries_containers.size < 3
-        puts "[parse_trends_page] Less than 3 'fe-related-queries.fe-atoms-generic-container' found. Skipping this query."
-        return []
-      end
-      
-      # Get the 3rd container
-      related_queries_container = related_queries_containers[2]
-      puts "[parse_trends_page] Found the 3rd 'fe-related-queries.fe-atoms-generic-container'."
-      
-      # Check if the title inside this container matches "Related queries"
-      related_queries_header = related_queries_container.css('div.fe-atoms-generic-title').find { |el| el.text.strip.include?("Related queries") }
-      
-      if related_queries_header.nil?
-        puts "[parse_trends_page] The 3rd container does not have 'Related queries' title. Skipping this query."
+      # Target the 'trends-widget' with 'widget-name="RELATED_QUERIES"'
+      trends_widgets = doc.css('trends-widget[widget-name="RELATED_QUERIES"]')
+  
+      if trends_widgets.empty?
+        puts "[parse_trends_page] No 'trends-widget' with 'RELATED_QUERIES' found. Skipping this query."
         return []
       end
   
-      puts "[parse_trends_page] 'Related queries' header found in the 3rd container."
+      related_queries_container = trends_widgets.css('div.fe-related-queries.fe-atoms-generic-container')
   
-      # Now scrape the items within this container
+      if related_queries_container.empty?
+        puts "[parse_trends_page] No 'fe-related-queries' container found within the 'RELATED_QUERIES' widget."
+        return []
+      else
+        puts "[parse_trends_page] 'RELATED_QUERIES' widget and 'fe-related-queries' container found."
+      end
+  
+      # Extract items within the related queries container
       items = related_queries_container.css('div.item')
-      
-      if items.nil? || items.empty?
+  
+      if items.empty?
         puts "[parse_trends_page] No items found in the related queries container."
-        puts "\n"
         return []
       end
-      
+  
       # Extract data from the items
       data = items.map do |item|
         link_element = item.at_css('div.progress-label-wrapper a.progress-label')
         link_href = link_element ? link_element['href'] : ''
-    
+  
         seed = item.at_css('div.label-text span')&.text&.strip
         rising_value = item.at_css('div.rising-value')&.text&.strip
   
@@ -185,7 +178,7 @@ class GoogleTrendsScraper
           rising_value: rising_value
         }
       end
-
+  
       data
     rescue => e
       puts "[parse_trends_page] Error parsing trends page: #{e.message}"
@@ -234,7 +227,7 @@ class GoogleTrendsScraper
       CSV.open(filepath, "wb") do |csv|
         csv << ["Query", "Line Number", "Seed", "Link", "Rising Value", "Date"] # Add "Date" column
         data.each do |entry|
-          csv << [query.upcase, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
+          csv << [query, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
         end
       end
       puts "[write_to_csv] CSV file '#{filename}' written successfully."
@@ -268,13 +261,14 @@ class GoogleTrendsScraper
           write_to_csv(data, filename, query)        # Pass the query to the write_to_csv method
           append_to_combined_csv(data, query)        # Pass the query to the append_to_combined_csv method
 
-          puts "_" * 60
-          puts "\n"
           puts "[fetch_and_export_trends] Data written to CSV for query: #{query}."
+          puts "\n"
+          puts "_" * 60
         else
           unsuccessful_scrapes += 1
-
           puts "[fetch_and_export_trends] No data found to write to the CSV for query: #{query}."
+          puts "\n"
+          puts "_" * 60
         end
       end
 
