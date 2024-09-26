@@ -38,7 +38,7 @@ class GoogleTrendsScraper
 
   # Fetch the Google Trends page with pagination logic
   def fetch_trends_pages(driver, wait, query, max_pages = 5)
-    driver.navigate.to("https://trends.google.com/trends/explore?q=#{query}&date=now%201-d&geo=CA&hl=en-US")
+    driver.navigate.to("https://trends.google.com/trends/explore?q=#{query}&date=now%207-d&geo=CA&hl=en-US")
 
     # Wait for the page to load completely
     wait.until { driver.execute_script("return document.readyState") == "complete" }
@@ -111,7 +111,7 @@ class GoogleTrendsScraper
     while scroll_attempts < max_scroll_attempts
       # Scroll to the bottom of the page
       driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-      sleep(2) # Give time for lazy-loaded content to load
+      sleep(3) # Give time for lazy-loaded content to load
 
       new_height = driver.execute_script("return document.body.scrollHeight")
       if new_height == previous_height
@@ -123,46 +123,56 @@ class GoogleTrendsScraper
     end
   end
 
-  # Parse the fetched HTML and extract trends data
   def parse_trends_page(html)
     return [] unless html
-
+  
     doc = Nokogiri::HTML.parse(html)
-
+  
     begin
+      # Find all containers related to the Google Trends page content
       containers = doc.css('div.fe-atoms-generic-content-container')
       puts "Found #{containers.size} 'div.fe-atoms-generic-content-container' containers"
-
-      if containers.size < 5
-        puts "Less than 5 'div.fe-atoms-generic-content-container' found. Skipping this query."
+  
+      # Now specifically target the container that contains "Related queries"
+      related_queries_header = doc.at_css('div.fe-atoms-generic-title:contains("Related queries")')
+  
+      if related_queries_header.nil?
+        puts "Related queries header not found. Skipping this query."
         return []
       end
-
-      content_container = containers[4] # Target the 5th container
-      puts "5th container HTML: #{content_container.to_html}" # Debugging: Print HTML
-
-      items = content_container.css('div.item')
-
+  
+      # From the related queries header, get the closest ancestor with the desired class
+      related_queries_container = related_queries_header.ancestors('div.fe-atoms-generic-container').first
+  
+      if related_queries_container.nil?
+        puts "Related queries container not found. Skipping this query."
+        return []
+      end
+  
+      puts "Related queries container found."
+  
+      items = related_queries_container.css('div.item')
+  
       if items.nil? || items.empty?
-        puts "No items found in the 5th 'div.item'."
+        puts "No items found in the related queries container."
         return []
       end
-
+  
       # Extract data from the items
       data = items.map do |item|
         link_element = item.at_css('div.progress-label-wrapper a.progress-label')
         link_href = link_element ? link_element['href'] : ''
-
+  
         seed = item.at_css('div.label-text span')&.text&.strip
         rising_value = item.at_css('div.rising-value')&.text&.strip
-
+  
         {
           link: link_href,
           seed: seed,
           rising_value: rising_value
         }
       end
-
+  
       data
     rescue => e
       puts "Error parsing trends page: #{e.message}"
@@ -230,6 +240,9 @@ class GoogleTrendsScraper
     @driver = Selenium::WebDriver.for :chrome, options: options
     @wait = Selenium::WebDriver::Wait.new(timeout: 20)
 
+    successful_scrapes = 0
+    unsuccessful_scrapes = 0
+
     # Process the queries in batches and write CSV files
     queries.each_slice(rand(3..5)).with_index do |query_batch, index|
       query_batch.each do |query|
@@ -237,9 +250,15 @@ class GoogleTrendsScraper
         data = fetch_trends_pages(@driver, @wait, query, max_pages)
 
         if data.any?
+
+          successful_scrapes += 1
+
           write_to_csv(data, filename, query)        # Pass the query to the write_to_csv method
           append_to_combined_csv(data, query)        # Pass the query to the append_to_combined_csv method
         else
+
+          unsuccessful_scrapes += 1
+
           puts "No data found to write to the CSV for query: #{query}."
         end
       end
@@ -264,6 +283,8 @@ class GoogleTrendsScraper
 
     # Create a ZIP file with all the generated CSV files
     create_zip_from_csv_files(queries)
-  end
 
+    puts "Total successful scrapes: #{successful_scrapes}"
+    puts "Total unsuccessful scrapes: #{unsuccessful_scrapes}"
+  end
 end
