@@ -24,12 +24,18 @@ class GoogleTrendsScraper
           # Only include the CSV file if it exists
           if File.exist?(csv_filepath)
             zipfile.add(filename, csv_filepath)
+            puts "\n"
+            puts "File that is found for query: #{query} is added to the ZIP file."
+            puts "_" * 60
           else
-            puts "File not found for query: #{query}, skipping."
-          end
+            puts "\n"
+            puts "File not found for query: #{query}"
+          end 
         end
       end
-
+      puts "\n"
+      puts "_" * 60
+      puts "\n"
       puts "ZIP file 'trends_data.zip' created successfully."
     rescue => e
       puts "Error creating ZIP file: #{e.message}"
@@ -62,9 +68,14 @@ class GoogleTrendsScraper
           total_item_number += 1
           all_data << item
         end
-        puts "Scraped data from page #{page_number}."
+        puts "+" * 5
+        puts "[fetch_trends_page] Scraped data from page #{page_number}."
       else
-        puts "No data found on page #{page_number}. Ending scraping."
+        puts "_" * 60
+        puts "\n"
+        puts "Sorry !"
+        puts "\n"
+        puts "[fetch_trends_page] No data found on page #{page_number}. Ending scraping."
         break
       end
 
@@ -83,18 +94,18 @@ class GoogleTrendsScraper
             wait.until { driver.execute_script("return document.readyState") == "complete" }
             page_number += 1
           else
-            puts "Next button is present but not clickable. Ending pagination."
+            puts "[fetch_trends_page] Next button is present but not clickable. Ending pagination."
             break
           end
         else
-          puts "No more 'Next' buttons found, ending pagination."
+          puts "[fetch_trends_page] No more 'Next' buttons found, ending pagination."
           break
         end
       rescue Selenium::WebDriver::Error::NoSuchElementError
-        puts "No 'Next' button found, ending pagination."
+        puts "[fetch_trends_page] No 'Next' button found, ending pagination."
         break
       rescue Selenium::WebDriver::Error::ElementClickInterceptedError
-        puts "Element click intercepted, trying to handle overlay or obstruction."
+        puts "[fetch_trends_page] Element click intercepted, trying to handle overlay or obstruction."
       end
     end
 
@@ -128,40 +139,43 @@ class GoogleTrendsScraper
     doc = Nokogiri::HTML.parse(html)
   
     begin
-      # Now specifically target the container that contains "Related queries"
-      related_queries_header = doc.at_css('div.fe-atoms-generic-title:contains("Related queries")')
-  
+      # Find all 'fe-related-queries.fe-atoms-generic-container' containers
+      related_queries_containers = doc.css('div.fe-related-queries.fe-atoms-generic-container')
+      
+      # Ensure we have at least 3 such containers, and target the 3rd one
+      if related_queries_containers.size < 3
+        puts "[parse_trends_page] Less than 3 'fe-related-queries.fe-atoms-generic-container' found. Skipping this query."
+        return []
+      end
+      
+      # Get the 3rd container
+      related_queries_container = related_queries_containers[2]
+      puts "[parse_trends_page] Found the 3rd 'fe-related-queries.fe-atoms-generic-container'."
+      
+      # Check if the title inside this container matches "Related queries"
+      related_queries_header = related_queries_container.css('div.fe-atoms-generic-title').find { |el| el.text.strip.include?("Related queries") }
+      
       if related_queries_header.nil?
-        puts "Related queries header not found. Skipping this query."
-        return []
-      end
-
-      # Find all containers related to the Google Trends page content
-      containers = doc.css('div.fe-atoms-generic-content-container')
-      puts "Found #{containers.size} 'div.fe-atoms-generic-content-container' containers"
-    
-      # From the related queries header, get the closest ancestor with the desired class
-      related_queries_container = related_queries_header.ancestors('div.fe-atoms-generic-container').first
-  
-      if related_queries_container.nil?
-        puts "Related queries container not found. Skipping this query."
+        puts "[parse_trends_page] The 3rd container does not have 'Related queries' title. Skipping this query."
         return []
       end
   
-      puts "Related queries container found."
+      puts "[parse_trends_page] 'Related queries' header found in the 3rd container."
   
+      # Now scrape the items within this container
       items = related_queries_container.css('div.item')
-  
+      
       if items.nil? || items.empty?
-        puts "No items found in the related queries container."
+        puts "[parse_trends_page] No items found in the related queries container."
+        puts "\n"
         return []
       end
-  
+      
       # Extract data from the items
       data = items.map do |item|
         link_element = item.at_css('div.progress-label-wrapper a.progress-label')
         link_href = link_element ? link_element['href'] : ''
-  
+    
         seed = item.at_css('div.label-text span')&.text&.strip
         rising_value = item.at_css('div.rising-value')&.text&.strip
   
@@ -171,18 +185,18 @@ class GoogleTrendsScraper
           rising_value: rising_value
         }
       end
-  
+
       data
     rescue => e
-      puts "Error parsing trends page: #{e.message}"
+      puts "[parse_trends_page] Error parsing trends page: #{e.message}"
       []
     end
   end
-
+  
   # Method to append data to a combined CSV file
   def append_to_combined_csv(data, query)
     if data.empty?
-      puts "No data available to append to the combined CSV file."
+      puts "[append_to_combined_csv] No data available to append to the combined CSV file."
       return
     end
 
@@ -200,16 +214,16 @@ class GoogleTrendsScraper
           csv << [query, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
         end
       end
-      puts "CSV file 'all_trends_data.csv' updated successfully."
+      puts "[append_to_combined_csv] CSV file 'all_trends_data.csv' updated successfully."
     rescue => e
-      puts "Error writing to combined CSV file 'all_trends_data.csv': #{e.message}"
+      puts "[append_to_combined_csv] Error writing to combined CSV file 'all_trends_data.csv': #{e.message}"
     end
   end
 
   # Method to write data to a CSV file
   def write_to_csv(data, filename, query)
     if data.empty?
-      puts "No data available to write to the CSV file."
+      puts "[write_to_csv] No data available to write to the CSV file."
       return
     end
 
@@ -223,9 +237,9 @@ class GoogleTrendsScraper
           csv << [query, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
         end
       end
-      puts "CSV file '#{filename}' written successfully."
+      puts "[write_to_csv] CSV file '#{filename}' written successfully."
     rescue => e
-      puts "Error writing CSV file '#{filename}': #{e.message}"
+      puts "[write_to_csv] Error writing CSV file '#{filename}': #{e.message}"
     end
   end
 
@@ -249,16 +263,18 @@ class GoogleTrendsScraper
         data = fetch_trends_pages(@driver, @wait, query, max_pages)
 
         if data.any?
-
           successful_scrapes += 1
 
           write_to_csv(data, filename, query)        # Pass the query to the write_to_csv method
           append_to_combined_csv(data, query)        # Pass the query to the append_to_combined_csv method
-        else
 
+          puts "_" * 60
+          puts "\n"
+          puts "[fetch_and_export_trends] Data written to CSV for query: #{query}."
+        else
           unsuccessful_scrapes += 1
 
-          puts "No data found to write to the CSV for query: #{query}."
+          puts "[fetch_and_export_trends] No data found to write to the CSV for query: #{query}."
         end
       end
 
@@ -282,8 +298,10 @@ class GoogleTrendsScraper
 
     # Create a ZIP file with all the generated CSV files
     create_zip_from_csv_files(queries)
-
-    puts "Total successful scrapes: #{successful_scrapes}"
-    puts "Total unsuccessful scrapes: #{unsuccessful_scrapes}"
+    puts "_" * 60
+    puts "\n"
+    puts "[fetch_and_export_trends] Total successful scrapes: #{successful_scrapes}"
+    puts "[fetch_and_export_trends] Total unsuccessful scrapes: #{unsuccessful_scrapes}"
+    puts "_" * 60
   end
 end
