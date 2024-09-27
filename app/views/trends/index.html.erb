@@ -27,6 +27,16 @@
               <%= form.label :queries, "Enter search queries (comma separated)", class: "form-label" %>
               <%= form.text_field :queries, class: "form-control", placeholder: "e.g., 'star wars, philipines, japan'" %>
             </div>
+            <div class="mb-3">
+              <%= form.label :pick_date, "Select Date Range", class: "form-label" %>
+              <%= form.select :pick_date, options_for_select([['Past 1 Hour', '201-H'], 
+                                                              ['Past 4 Hours', '204-H'], 
+                                                              ['Past Day', '201-d'], 
+                                                              ['Past 7 Days', '207-d'], 
+                                                              ['Past 30 Days', '201-m'], 
+                                                              ['Past 90 Days', '203-m']]), {}, {class: "form-control"} %>
+            </div>
+
 
             <div class="text-center">
               <%= form.submit "Fetch Trends", class: "btn btn-primary" %>

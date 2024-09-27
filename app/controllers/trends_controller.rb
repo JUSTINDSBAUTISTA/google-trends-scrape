@@ -5,12 +5,13 @@ class TrendsController < ApplicationController
 
   def fetch_trends
     queries = params[:queries].split(",")  # Get queries from the form input
-  
+    pick_date = params[:pick_date]         # Get selected date range from dropdown
+
     begin
       scraper = GoogleTrendsScraper.new
   
-      # Call the fetch_and_export_trends method in the scraper, defaulting to 5 pages
-      scraper.fetch_and_export_trends(queries)
+      # Pass queries and pick_date to the scraper
+      scraper.fetch_and_export_trends(queries, pick_date)
   
       flash[:notice] = "Google Trends data fetched successfully!"
     rescue => e

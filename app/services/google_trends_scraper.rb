@@ -43,50 +43,41 @@ class GoogleTrendsScraper
   end
 
   # Fetch the Google Trends page with pagination logic
-  def fetch_trends_pages(driver, wait, query, max_pages = 5)
-    driver.navigate.to("https://trends.google.com/trends/explore?q=#{query}&date=now%207-d&geo=CA&hl=en-US")
+  def fetch_trends_pages(driver, wait, query, pick_date, max_pages = 5)
+    # Use the pick_date in the Google Trends URL
+    driver.navigate.to("https://trends.google.com/trends/explore?q=#{query}&date=now%#{pick_date}&geo=CA&hl=en-US")
 
     # Wait for the page to load completely
     wait.until { driver.execute_script("return document.readyState") == "complete" }
     sleep(rand(2.0..3.0))
+
     all_data = []
     page_number = 1
     total_item_number = 1  # To keep track of global line numbers
 
-    # Ensure the page is scrolled to load all content
     scroll_down_until_no_new_content(driver)
+    
     while page_number <= max_pages
-      # Scrape the data from the current page
       html = driver.page_source
       page_data = parse_trends_page(html)
 
-      # Ensure that data from the current page is unique and non-empty
       if page_data.any?
         page_data.each do |item|
-          # Add a global line number to the data
           item[:line_number] = total_item_number
           total_item_number += 1
           all_data << item
         end
-        puts "+" * 5
         puts "[fetch_trends_page] Scraped data from page #{page_number}."
       else
-        puts "_" * 60
-        puts "\n"
-        puts "Sorry !"
-        puts "\n"
         puts "[fetch_trends_page] No data found on page #{page_number}. Ending scraping."
         break
       end
 
-      # Try to find and click the "Next" button for pagination
       begin
         next_buttons = driver.find_elements(css: 'button[aria-label="Next"]')
 
         if next_buttons.any?
           next_button = next_buttons.last
-
-          # Ensure the button is displayed and clickable
           if next_button.displayed? && next_button.enabled?
             driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
             wait.until { next_button.displayed? && next_button.enabled? }
@@ -238,7 +229,8 @@ class GoogleTrendsScraper
 
 
   # Main method to fetch and export trends
-  def fetch_and_export_trends(queries, max_pages = 5)
+  
+  def fetch_and_export_trends(queries, pick_date, max_pages = 5)
     options = Selenium::WebDriver::Chrome::Options.new
     user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36'
     options.add_argument("user-agent=#{user_agent}")
@@ -249,26 +241,19 @@ class GoogleTrendsScraper
     successful_scrapes = 0
     unsuccessful_scrapes = 0
 
-    # Process the queries in batches and write CSV files
     queries.each_slice(rand(3..5)).with_index do |query_batch, index|
       query_batch.each do |query|
         filename = "#{query.parameterize}.csv"
-        data = fetch_trends_pages(@driver, @wait, query, max_pages)
+        data = fetch_trends_pages(@driver, @wait, query, pick_date, max_pages)
 
         if data.any?
           successful_scrapes += 1
-
-          write_to_csv(data, filename, query)        # Pass the query to the write_to_csv method
-          append_to_combined_csv(data, query)        # Pass the query to the append_to_combined_csv method
-
+          write_to_csv(data, filename, query)
+          append_to_combined_csv(data, query)
           puts "[fetch_and_export_trends] Data written to CSV for query: #{query}."
-          puts "\n"
-          puts "_" * 60
         else
           unsuccessful_scrapes += 1
           puts "[fetch_and_export_trends] No data found to write to the CSV for query: #{query}."
-          puts "\n"
-          puts "_" * 60
         end
       end
 
@@ -289,13 +274,8 @@ class GoogleTrendsScraper
     end
 
     @driver.quit
-
-    # Create a ZIP file with all the generated CSV files
     create_zip_from_csv_files(queries)
-    puts "_" * 60
-    puts "\n"
     puts "[fetch_and_export_trends] Total successful scrapes: #{successful_scrapes}"
     puts "[fetch_and_export_trends] Total unsuccessful scrapes: #{unsuccessful_scrapes}"
-    puts "_" * 60
   end
 end
