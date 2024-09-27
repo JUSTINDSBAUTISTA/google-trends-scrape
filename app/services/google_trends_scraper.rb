@@ -38,7 +38,7 @@ class GoogleTrendsScraper
       puts "\n"
       puts "ZIP file 'trends_data.zip' created successfully."
     rescue => e
-      puts "Error creating ZIP file: #{e.messffage}"
+      puts "Error creating ZIP file: #{e.message}"
     end
   end
 
