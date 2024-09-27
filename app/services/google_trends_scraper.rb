@@ -271,6 +271,9 @@ class GoogleTrendsScraper
       end
 
       if (index + 1) < (queries.size / query_batch.size.to_f).ceil
+        # Execute the AppleScript to change the VPN location
+        change_vpn_location
+
         @driver.execute_script("window.open('about:blank', '_blank');")
         new_tab_handle = @driver.window_handles.last
         old_tab_handle = @driver.window_handles.first
@@ -290,5 +293,17 @@ class GoogleTrendsScraper
     create_zip_from_csv_files(queries)
     puts "[fetch_and_export_trends] Total successful scrapes: #{successful_scrapes}"
     puts "[fetch_and_export_trends] Total unsuccessful scrapes: #{unsuccessful_scrapes}"
+  end
+
+  # Method to change VPN location by running the AppleScript
+  def change_vpn_location
+    begin
+      puts "[change_vpn_location] Changing VPN location..."
+      # Assuming your AppleScript is saved as change_vpn_location.scpt in the project root
+      system("osascript #{Rails.root.join('location_handler.scpt')}")
+      puts "[change_vpn_location] VPN location changed successfully."
+    rescue => e
+      puts "[change_vpn_location] Error changing VPN location: #{e.message}"
+    end
   end
 end
