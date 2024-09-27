@@ -46,21 +46,21 @@ class GoogleTrendsScraper
   def fetch_trends_pages(driver, wait, query, pick_date, max_pages = 5)
     # Use the pick_date in the Google Trends URL
     driver.navigate.to("https://trends.google.com/trends/explore?q=#{query}&date=now%#{pick_date}&geo=CA&hl=en-US")
-
+  
     # Wait for the page to load completely
     wait.until { driver.execute_script("return document.readyState") == "complete" }
     sleep(rand(2.0..3.0))
-
+  
     all_data = []
     page_number = 1
     total_item_number = 1  # To keep track of global line numbers
-
+  
     scroll_down_until_no_new_content(driver)
     
     while page_number <= max_pages
       html = driver.page_source
-      page_data = parse_trends_page(html)
-
+      page_data, next_button_found = parse_trends_page(html)
+  
       if page_data.any?
         page_data.each do |item|
           item[:line_number] = total_item_number
@@ -72,36 +72,43 @@ class GoogleTrendsScraper
         puts "[fetch_trends_page] No data found on page #{page_number}. Ending scraping."
         break
       end
-
-      begin
-        next_buttons = driver.find_elements(css: 'button[aria-label="Next"]')
-
-        if next_buttons.any?
-          next_button = next_buttons.last
-          if next_button.displayed? && next_button.enabled?
-            driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
-            wait.until { next_button.displayed? && next_button.enabled? }
-            next_button.click
-            wait.until { driver.execute_script("return document.readyState") == "complete" }
-            page_number += 1
+  
+      # Handle pagination based on the presence of the Next button
+      if next_button_found
+        begin
+          next_buttons = driver.find_elements(css: 'button[aria-label="Next"]')
+  
+          if next_buttons.any?
+            next_button = next_buttons.last
+            if next_button.displayed? && next_button.enabled?
+              driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
+              wait.until { next_button.displayed? && next_button.enabled? }
+              next_button.click
+              wait.until { driver.execute_script("return document.readyState") == "complete" }
+              page_number += 1
+            else
+              puts "[fetch_trends_page] Next button is present but not clickable. Ending pagination."
+              break
+            end
           else
-            puts "[fetch_trends_page] Next button is present but not clickable. Ending pagination."
+            puts "[fetch_trends_page] No more 'Next' buttons found, ending pagination."
             break
           end
-        else
-          puts "[fetch_trends_page] No more 'Next' buttons found, ending pagination."
+        rescue Selenium::WebDriver::Error::NoSuchElementError
+          puts "[fetch_trends_page] No 'Next' button found, ending pagination."
           break
+        rescue Selenium::WebDriver::Error::ElementClickInterceptedError
+          puts "[fetch_trends_page] Element click intercepted, trying to handle overlay or obstruction."
         end
-      rescue Selenium::WebDriver::Error::NoSuchElementError
+      else
         puts "[fetch_trends_page] No 'Next' button found, ending pagination."
         break
-      rescue Selenium::WebDriver::Error::ElementClickInterceptedError
-        puts "[fetch_trends_page] Element click intercepted, trying to handle overlay or obstruction."
       end
     end
-
+  
     all_data
   end
+  
 
   # Scroll down the page until no new content appears
   def scroll_down_until_no_new_content(driver)
@@ -125,7 +132,7 @@ class GoogleTrendsScraper
   end
 
   def parse_trends_page(html)
-    return [] unless html
+    return [], false unless html
   
     doc = Nokogiri::HTML.parse(html)
   
@@ -135,14 +142,14 @@ class GoogleTrendsScraper
   
       if trends_widgets.empty?
         puts "[parse_trends_page] No 'trends-widget' with 'RELATED_QUERIES' found. Skipping this query."
-        return []
+        return [], false
       end
   
       related_queries_container = trends_widgets.css('div.fe-related-queries.fe-atoms-generic-container')
   
       if related_queries_container.empty?
         puts "[parse_trends_page] No 'fe-related-queries' container found within the 'RELATED_QUERIES' widget."
-        return []
+        return [], false
       else
         puts "[parse_trends_page] 'RELATED_QUERIES' widget and 'fe-related-queries' container found."
       end
@@ -152,7 +159,7 @@ class GoogleTrendsScraper
   
       if items.empty?
         puts "[parse_trends_page] No items found in the related queries container."
-        return []
+        return [], false
       end
   
       # Extract data from the items
@@ -170,12 +177,18 @@ class GoogleTrendsScraper
         }
       end
   
-      data
+      # Check if there is a "Next" button inside the trends_widgets
+      next_button = trends_widgets.at_css('button[aria-label="Next"]')
+  
+      next_button_found = next_button && next_button['disabled'].nil?
+      return data, next_button_found
+  
     rescue => e
       puts "[parse_trends_page] Error parsing trends page: #{e.message}"
-      []
+      return [], false
     end
   end
+  
   
   # Method to append data to a combined CSV file
   def append_to_combined_csv(data, query)
