@@ -44,9 +44,10 @@ class GoogleTrendsScraper
 
   # Fetch the Google Trends page with pagination logic
   def fetch_trends_pages(driver, wait, query, pick_date, max_pages = 5)
-    # Use the pick_date in the Google Trends URL
-    driver.navigate.to("https://trends.google.com/trends/explore?q=#{query}&date=now%#{pick_date}&geo=US&hl=en-US")
-  
+    # Use the tag in the Google Trends URL for search query
+    tag = query[:tag]
+    driver.navigate.to("https://trends.google.com/trends/explore?q=#{tag}&date=now%#{pick_date}&geo=US&hl=en-US")
+
     # Wait for the page to load completely
     wait.until { driver.execute_script("return document.readyState") == "complete" }
     sleep(rand(2.0..3.0))
@@ -188,27 +189,26 @@ class GoogleTrendsScraper
       return [], false
     end
   end
-  
-  
-  # Method to append data to a combined CSV file
+
+  # Method to append data to a combined CSV file with idType and tagType
   def append_to_combined_csv(data, query)
     if data.empty?
       puts "[append_to_combined_csv] No data available to append to the combined CSV file."
       return
     end
 
-    combined_filename = 'all_trends_data.csv' # Name of the combined CSV file
-    filepath = Rails.root.join('public', combined_filename) # Save file in the public directory
-    current_date = Date.today.strftime('%Y-%m-%d') # Get current date in YYYY-MM-DD format
+    combined_filename = 'all_trends_data.csv'
+    filepath = Rails.root.join('public', combined_filename)
+    current_date = Date.today.strftime('%Y-%m-%d')
 
     begin
       CSV.open(filepath, "a+") do |csv|
         if csv.count.zero?
           # Add headers only if the file is empty (newly created)
-          csv << ["Query", "Line Number", "Seed", "Link", "Rising Value", "Date"] # Add "Date" column
+          csv << ["Query", "Line Number", "Seed", "Link", "Rising Value", "idType", "tagType", "Date"]
         end
         data.each do |entry|
-          csv << [query.upcase, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
+          csv << [query[:tag].upcase, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], query[:idType], query[:tagType], current_date]
         end
       end
       puts "[append_to_combined_csv] CSV file 'all_trends_data.csv' updated successfully."
@@ -224,14 +224,14 @@ class GoogleTrendsScraper
       return
     end
 
-    filepath = Rails.root.join('public', filename) # Save file in the public directory
-    current_date = Date.today.strftime('%Y-%m-%d') # Get current date in YYYY-MM-DD format
+    filepath = Rails.root.join('public', filename)
+    current_date = Date.today.strftime('%Y-%m-%d')
 
     begin
       CSV.open(filepath, "wb") do |csv|
-        csv << ["Query", "Line Number", "Seed", "Link", "Rising Value", "Date"] # Add "Date" column
+        csv << ["Query", "Line Number", "Seed", "Link", "Rising Value", "idType", "tagType", "Date"]
         data.each do |entry|
-          csv << [query, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
+          csv << [query[:tag], entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], query[:idType], query[:tagType], current_date]
         end
       end
       puts "[write_to_csv] CSV file '#{filename}' written successfully."
@@ -240,10 +240,8 @@ class GoogleTrendsScraper
     end
   end
 
-
   # Main method to fetch and export trends
-  
-  def fetch_and_export_trends(queries, pick_date, max_pages = 5)
+  def fetch_and_export_trends(queries, pick_date = '201-d', max_pages = 5)
     options = Selenium::WebDriver::Chrome::Options.new
     user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36'
     options.add_argument("user-agent=#{user_agent}")
@@ -256,27 +254,23 @@ class GoogleTrendsScraper
 
     queries.each_slice(rand(5..8)).with_index do |query_batch, index|
       query_batch.each do |query|
-        filename = "#{query.parameterize}.csv"
+        filename = "#{query[:tag].parameterize}.csv"
         data = fetch_trends_pages(@driver, @wait, query, pick_date, max_pages)
 
         if data.any?
           successful_scrapes += 1
           write_to_csv(data, filename, query)
           append_to_combined_csv(data, query)
-          puts "[fetch_and_export_trends] Data written to CSV for query: #{query}."
+          puts "[fetch_and_export_trends] Data written to CSV for query: #{query[:tag]}."
         else
           unsuccessful_scrapes += 1
-          puts "[fetch_and_export_trends] No data found to write to the CSV for query: #{query}."
+          puts "[fetch_and_export_trends] No data found to write to the CSV for query: #{query[:tag]}."
         end
       end
 
       if (index + 1) < (queries.size / query_batch.size.to_f).ceil
-
-        # Execute the AppleScript to change the VPN location
         change_vpn_location
-
         @driver.navigate.refresh
-
         @driver.execute_script("window.open('about:blank', '_blank');")
 
         new_tab_handle = @driver.window_handles.last
@@ -293,7 +287,7 @@ class GoogleTrendsScraper
     end
 
     @driver.quit
-    create_zip_from_csv_files(queries)
+    create_zip_from_csv_files(queries.map { |query| query[:tag] })
     puts "[fetch_and_export_trends] Total successful scrapes: #{successful_scrapes}"
     puts "[fetch_and_export_trends] Total unsuccessful scrapes: #{unsuccessful_scrapes}"
   end
