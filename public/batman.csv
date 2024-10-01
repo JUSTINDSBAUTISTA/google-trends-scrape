@@ -1,26 +1,22 @@
-Query,Line Number,Seed,Link,Rising Value,Date
- Batman,1,Meta quest 3s,https://trends.google.ca/trends/explore?q=meta+quest+3s&date=now+7-d&geo=CA,Breakout,2024-10-01
- Batman,2,Batman beyond year one,https://trends.google.ca/trends/explore?q=batman+beyond+year+one&date=now+7-d&geo=CA,Breakout,2024-10-01
- Batman,3,Batman adversary with a stitched burlap mask,https://trends.google.ca/trends/explore?q=batman+adversary+with+a+stitched+burlap+mask&date=now+7-d&geo=CA,Breakout,2024-10-01
- Batman,4,Julian rush batman,https://trends.google.ca/trends/explore?q=julian+rush+batman&date=now+7-d&geo=CA,"+1,550%",2024-10-01
- Batman,5,Meta quest 3,https://trends.google.ca/trends/explore?q=meta+quest+3&date=now+7-d&geo=CA,+500%,2024-10-01
- Batman,6,Batman arkham collection,https://trends.google.ca/trends/explore?q=batman+arkham+collection&date=now+7-d&geo=CA,+300%,2024-10-01
- Batman,7,Batman arkham shadow,https://trends.google.ca/trends/explore?q=batman+arkham+shadow&date=now+7-d&geo=CA,+250%,2024-10-01
- Batman,8,New batman game,https://trends.google.ca/trends/explore?q=new+batman+game&date=now+7-d&geo=CA,+170%,2024-10-01
- Batman,9,Batman vr,https://trends.google.ca/trends/explore?q=batman+vr&date=now+7-d&geo=CA,+160%,2024-10-01
- Batman,10,Batman arkham shadow release date,https://trends.google.ca/trends/explore?q=batman+arkham+shadow+release+date&date=now+7-d&geo=CA,+160%,2024-10-01
- Batman,11,Johnny viti batman,https://trends.google.ca/trends/explore?q=johnny+viti+batman&date=now+7-d&geo=CA,+160%,2024-10-01
- Batman,12,Batman return to arkham,https://trends.google.ca/trends/explore?q=batman+return+to+arkham&date=now+7-d&geo=CA,+160%,2024-10-01
- Batman,13,Cast of batman and robin,https://trends.google.ca/trends/explore?q=cast+of+batman+and+robin&date=now+7-d&geo=CA,+120%,2024-10-01
- Batman,14,The penguin episode 2,https://trends.google.ca/trends/explore?q=the+penguin+episode+2&date=now+7-d&geo=CA,+110%,2024-10-01
- Batman,15,Batman actors list,https://trends.google.ca/trends/explore?q=batman+actors+list&date=now+7-d&geo=CA,+100%,2024-10-01
- Batman,16,Batman turkey,https://trends.google.ca/trends/explore?q=batman+turkey&date=now+7-d&geo=CA,+100%,2024-10-01
- Batman,17,Batman ps5,https://trends.google.ca/trends/explore?q=batman+ps5&date=now+7-d&geo=CA,+90%,2024-10-01
- Batman,18,Joker folie à deux,https://trends.google.ca/trends/explore?q=joker+folie+%C3%A0+deux&date=now+7-d&geo=CA,+90%,2024-10-01
- Batman,19,Batman beyond movie,https://trends.google.ca/trends/explore?q=batman+beyond+movie&date=now+7-d&geo=CA,+80%,2024-10-01
- Batman,20,How tall is batman,https://trends.google.ca/trends/explore?q=how+tall+is+batman&date=now+7-d&geo=CA,+70%,2024-10-01
- Batman,21,The joker 2,https://trends.google.ca/trends/explore?q=the+joker+2&date=now+7-d&geo=CA,+70%,2024-10-01
- Batman,22,Batman and catwoman costume,https://trends.google.ca/trends/explore?q=batman+and+catwoman+costume&date=now+7-d&geo=CA,+70%,2024-10-01
- Batman,23,Batman and harley quinn,https://trends.google.ca/trends/explore?q=batman+and+harley+quinn&date=now+7-d&geo=CA,+60%,2024-10-01
- Batman,24,Batman costume adult,https://trends.google.ca/trends/explore?q=batman+costume+adult&date=now+7-d&geo=CA,+50%,2024-10-01
- Batman,25,Batman beyond return of the joker,https://trends.google.ca/trends/explore?q=batman+beyond+return+of+the+joker&date=now+7-d&geo=CA,+50%,2024-10-01
+Query,Line Number,Seed,Link,Rising Value,idType,tagType,Date
+Batman,1,Julian rush batman,https://trends.google.ca/trends/explore?q=julian+rush+batman&date=now+7-d&geo=US,"+2,800%",217,Franchise,2024-10-01
+Batman,2,Meta quest 3,https://trends.google.ca/trends/explore?q=meta+quest+3&date=now+7-d&geo=US,+650%,217,Franchise,2024-10-01
+Batman,3,Batman beyond year one,https://trends.google.ca/trends/explore?q=batman+beyond+year+one&date=now+7-d&geo=US,+300%,217,Franchise,2024-10-01
+Batman,4,Batman arkham shadow,https://trends.google.ca/trends/explore?q=batman+arkham+shadow&date=now+7-d&geo=US,+250%,217,Franchise,2024-10-01
+Batman,5,The penguin episode 2,https://trends.google.ca/trends/explore?q=the+penguin+episode+2&date=now+7-d&geo=US,+150%,217,Franchise,2024-10-01
+Batman,6,Johnny viti batman,https://trends.google.ca/trends/explore?q=johnny+viti+batman&date=now+7-d&geo=US,+140%,217,Franchise,2024-10-01
+Batman,7,Batman vr,https://trends.google.ca/trends/explore?q=batman+vr&date=now+7-d&geo=US,+130%,217,Franchise,2024-10-01
+Batman,8,New batman game,https://trends.google.ca/trends/explore?q=new+batman+game&date=now+7-d&geo=US,+120%,217,Franchise,2024-10-01
+Batman,9,Batman return to arkham,https://trends.google.ca/trends/explore?q=batman+return+to+arkham&date=now+7-d&geo=US,+120%,217,Franchise,2024-10-01
+Batman,10,Batman arkham shadow release date,https://trends.google.ca/trends/explore?q=batman+arkham+shadow+release+date&date=now+7-d&geo=US,+110%,217,Franchise,2024-10-01
+Batman,11,Batman and harley quinn,https://trends.google.ca/trends/explore?q=batman+and+harley+quinn&date=now+7-d&geo=US,+60%,217,Franchise,2024-10-01
+Batman,12,Is the penguin after the batman,https://trends.google.ca/trends/explore?q=is+the+penguin+after+the+batman&date=now+7-d&geo=US,+60%,217,Franchise,2024-10-01
+Batman,13,Batman and catwoman costume,https://trends.google.ca/trends/explore?q=batman+and+catwoman+costume&date=now+7-d&geo=US,+60%,217,Franchise,2024-10-01
+Batman,14,Catwoman costume,https://trends.google.ca/trends/explore?q=catwoman+costume&date=now+7-d&geo=US,+60%,217,Franchise,2024-10-01
+Batman,15,Absolute batman #1,https://trends.google.ca/trends/explore?q=absolute+batman+%231&date=now+7-d&geo=US,+50%,217,Franchise,2024-10-01
+Batman,16,Batman beyond costume,https://trends.google.ca/trends/explore?q=batman+beyond+costume&date=now+7-d&geo=US,+50%,217,Franchise,2024-10-01
+Batman,17,Batman arkham,https://trends.google.ca/trends/explore?q=batman+arkham&date=now+7-d&geo=US,+50%,217,Franchise,2024-10-01
+Batman,18,Batman star walk of fame,https://trends.google.ca/trends/explore?q=batman+star+walk+of+fame&date=now+7-d&geo=US,+50%,217,Franchise,2024-10-01
+Batman,19,Batman halloween costume,https://trends.google.ca/trends/explore?q=batman+halloween+costume&date=now+7-d&geo=US,+40%,217,Franchise,2024-10-01
+Batman,20,Batman costume,https://trends.google.ca/trends/explore?q=batman+costume&date=now+7-d&geo=US,+40%,217,Franchise,2024-10-01
+Batman,21,Joker folie à deux,https://trends.google.ca/trends/explore?q=joker+folie+%C3%A0+deux&date=now+7-d&geo=US,+40%,217,Franchise,2024-10-01

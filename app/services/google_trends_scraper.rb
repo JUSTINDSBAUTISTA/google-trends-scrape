@@ -110,7 +110,6 @@ class GoogleTrendsScraper
     all_data
   end
   
-
   # Scroll down the page until no new content appears
   def scroll_down_until_no_new_content(driver)
     previous_height = driver.execute_script("return document.body.scrollHeight")
@@ -197,7 +196,11 @@ class GoogleTrendsScraper
       return
     end
 
-    combined_filename = 'all_trends_data.csv'
+    # Get the current date formatted as 'Month_Date_Year'
+    current_date_str = Date.today.strftime("%B_%d_%Y")
+
+    # Dynamically rename the combined CSV file based on the current date
+    combined_filename = "#{current_date_str}.csv"
     filepath = Rails.root.join('public', combined_filename)
     current_date = Date.today.strftime('%Y-%m-%d')
 
