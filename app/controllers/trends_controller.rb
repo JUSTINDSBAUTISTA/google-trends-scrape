@@ -1,28 +1,33 @@
 class TrendsController < ApplicationController
-  def fetch_trends
-    queries = params[:queries].to_s.split(',').map(&:strip)
-    puts "Queries count: #{queries.size}"
-    if queries.empty?
-      flash[:alert] = "Queries parameter is missing."
-      redirect_to trends_path
-      return
-    end
-  
-    email = ENV['GOOGLE_TRENDS_EMAIL']
-    password = ENV['GOOGLE_TRENDS_PASSWORD']
-  
-    if email.blank? || password.blank?
-      flash[:alert] = "Google account credentials are missing."
-      redirect_to trends_path
-      return
-    end
-  
-    # Create an instance of GoogleTrendsScraper with the correct number of arguments
-    scraper = GoogleTrendsScraper.new(email, password)
-    scraper.fetch_and_export_trends(queries)
-  
-    flash[:notice] = "Google Trends data has been exported."
-    redirect_to trends_path
+  def index
+    # Display form and existing CSV/ZIP files if necessary
   end
+
+  def fetch_trends
+    queries = params[:queries].split(",")  # Get queries from the form input
+    pick_date = params[:pick_date]         # Get selected date range from dropdown
+
+    begin
+      scraper = GoogleTrendsScraper.new
   
+      # Pass queries and pick_date to the scraper
+      scraper.fetch_and_export_trends(queries, pick_date)
+  
+      flash[:notice] = "Google Trends data fetched successfully!"
+    rescue => e
+      flash[:alert] = "An error occurred: #{e.message}"
+    ensure
+      redirect_to trends_path
+    end
+  end
+
+  def download_zip
+    zip_file = Rails.root.join('public', 'trends_data.zip')
+    if File.exist?(zip_file)
+      send_file(zip_file, type: 'application/zip', filename: 'trends_data.zip', disposition: 'attachment')
+    else
+      flash[:alert] = "ZIP file not found."
+      redirect_to trends_path
+    end
+  end
 end

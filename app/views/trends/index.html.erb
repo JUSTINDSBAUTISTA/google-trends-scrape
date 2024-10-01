@@ -5,6 +5,7 @@
         <div class="card-body">
           <h1 class="card-title text-center mb-4">Fetch Google Trends Data</h1>
 
+          <!-- Link to Download Combined CSV File -->
           <div class="text-right mb-3">
             <% combined_file = Rails.root.join('public', 'all_trends_data.csv') %>
             <% if File.exist?(combined_file) %>
@@ -12,18 +13,47 @@
             <% end %>
           </div>
 
-          <%= form_with url: trends_fetch_path, method: :post, html: { class: 'd-flex flex-column align-items-center' } do %>
-            <div class="mb-3 w-100">
-              <%= text_field_tag :queries, nil, placeholder: "Enter search queries separated by commas (e.g., star wars, philippines, japan)", class: 'form-control form-control-lg' %>
+          <!-- Link to Download ZIP File -->
+          <div class="text-right mb-3">
+            <% zip_file = Rails.root.join('public', 'trends_data.zip') %>
+            <% if File.exist?(zip_file) %>
+              <%= link_to "Download All CSVs as ZIP", "/trends_data.zip", class: 'btn btn-link', download: "trends_data.zip" %>
+            <% end %>
+          </div>
+
+          <!-- Form for Fetching Google Trends Data -->
+          <%= form_with url: fetch_trends_trends_path, method: :post, local: true, class: 'form' do |form| %>
+            <div class="mb-3">
+              <%= form.label :queries, "Enter search queries (comma separated)", class: "form-label" %>
+              <%= form.text_field :queries, class: "form-control", placeholder: "e.g., 'star wars, philipines, japan'" %>
             </div>
-            <%= submit_tag "Fetch Trends", class: 'btn btn-primary w-100' %>
+            <div class="mb-3">
+              <%= form.label :pick_date, "Select Date Range", class: "form-label" %>
+              <%= form.select :pick_date, options_for_select([['Past 1 Hour', '201-H'], 
+                                                              ['Past 4 Hours', '204-H'], 
+                                                              ['Past Day', '201-d'], 
+                                                              ['Past 7 Days', '207-d'], 
+                                                              ['Past 30 Days', '201-m'], 
+                                                              ['Past 90 Days', '203-m']]), {}, {class: "form-control"} %>
+            </div>
+
+
+            <div class="text-center">
+              <%= form.submit "Fetch Trends", class: "btn btn-primary" %>
+            </div>
           <% end %>
 
-          <% if flash[:alert] %>
-            <div class="alert alert-danger mt-3">
+          <!-- Flash Messages for Success/Error -->
+          <% if flash[:notice] %>
+            <div class="alert alert-success mt-3" role="alert">
+              <%= flash[:notice] %>
+            </div>
+          <% elsif flash[:alert] %>
+            <div class="alert alert-danger mt-3" role="alert">
               <%= flash[:alert] %>
             </div>
           <% end %>
+
         </div>
       </div>
     </div>

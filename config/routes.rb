@@ -1,4 +1,11 @@
+# config/routes.rb
 Rails.application.routes.draw do
-  get 'trends', to: 'trends#index'
-  post 'trends/fetch', to: 'trends#fetch_trends'
+  resources :trends, only: [:index] do
+    collection do
+      post :fetch_trends
+    end
+  end
+
+  # Route for serving the ZIP file
+  get '/trends_data.zip', to: 'trends#download_zip'
 end
