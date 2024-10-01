@@ -45,7 +45,7 @@ class GoogleTrendsScraper
   # Fetch the Google Trends page with pagination logic
   def fetch_trends_pages(driver, wait, query, pick_date, max_pages = 5)
     # Use the pick_date in the Google Trends URL
-    driver.navigate.to("https://trends.google.com/trends/explore?q=#{query}&date=now%#{pick_date}&geo=CA&hl=en-US")
+    driver.navigate.to("https://trends.google.com/trends/explore?q=#{query}&date=now%#{pick_date}&geo=US&hl=en-US")
   
     # Wait for the page to load completely
     wait.until { driver.execute_script("return document.readyState") == "complete" }
@@ -254,7 +254,7 @@ class GoogleTrendsScraper
     successful_scrapes = 0
     unsuccessful_scrapes = 0
 
-    queries.each_slice(rand(3..5)).with_index do |query_batch, index|
+    queries.each_slice(rand(5..8)).with_index do |query_batch, index|
       query_batch.each do |query|
         filename = "#{query.parameterize}.csv"
         data = fetch_trends_pages(@driver, @wait, query, pick_date, max_pages)
@@ -271,10 +271,14 @@ class GoogleTrendsScraper
       end
 
       if (index + 1) < (queries.size / query_batch.size.to_f).ceil
+
         # Execute the AppleScript to change the VPN location
         change_vpn_location
 
+        @driver.navigate.refresh
+
         @driver.execute_script("window.open('about:blank', '_blank');")
+
         new_tab_handle = @driver.window_handles.last
         old_tab_handle = @driver.window_handles.first
 
@@ -284,7 +288,6 @@ class GoogleTrendsScraper
           @driver.switch_to.window(old_tab_handle)
           @driver.close
         end
-
         @driver.switch_to.window(new_tab_handle)
       end
     end
