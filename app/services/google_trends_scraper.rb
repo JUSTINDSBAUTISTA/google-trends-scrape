@@ -40,101 +40,76 @@ class GoogleTrendsScraper
     # Use the tag in the Google Trends URL for search query
     tag = query[:tag]
     url = "https://trends.google.com/trends/explore?q=#{tag}&date=now%#{pick_date}&geo=US&hl=en-US"
+    
+    # Navigate to the URL
+    driver.navigate.to(url)
   
-    # Variables to handle retry for 429 error
-    max_retries = 3
-    retry_count = 0
-    success = false
+    # Refresh the page after navigating to the URL
+    driver.navigate.refresh
   
-    begin
-      driver.navigate.to(url)
+    # Wait for the page to reload completely after refresh
+    wait.until { driver.execute_script("return document.readyState") == "complete" }
+    sleep(rand(2.0..3.0))
   
-      # Wait for the page to load completely
-      wait.until { driver.execute_script("return document.readyState") == "complete" }
-      sleep(rand(2.0..3.0))
+ 
+    # Proceed with scraping once the page is successfully loaded
+    all_data = []
+    page_number = 1
+    total_item_number = 1  # To keep track of global line numbers
   
-      # Check if the page returned a 429 error
-      page_status = driver.execute_script("return document.readyState")
-      
-      if page_status == "429"
-        raise "Too Many Requests (429)"
-      else
-        success = true
-      end
+    scroll_down_until_no_new_content(driver)
   
-    rescue => e
-      if e.message.include?('429') && retry_count < max_retries
-        retry_count += 1
-        puts "[fetch_trends_pages] Received 429 error. Retrying... (Attempt #{retry_count})"
-        sleep(5)  # Delay before retrying, adjust the time as necessary
-        retry  # Retry the block
-      else
-        puts "[fetch_trends_pages] Error loading page or too many retries: #{e.message}"
-        return []  # Return empty array if the retries failed
-      end
-    end
+    while page_number <= max_pages
+      html = driver.page_source
+      page_data, next_button_found = parse_trends_page(html)
   
-    if success
-      # Proceed with scraping once the page is successfully loaded
-      all_data = []
-      page_number = 1
-      total_item_number = 1  # To keep track of global line numbers
-  
-      scroll_down_until_no_new_content(driver)
-  
-      while page_number <= max_pages
-        html = driver.page_source
-        page_data, next_button_found = parse_trends_page(html)
-  
-        if page_data.any?
-          page_data.each do |item|
-            item[:line_number] = total_item_number
-            total_item_number += 1
-            all_data << item
-          end
-          puts "[fetch_trends_page] Scraped data from page #{page_number}."
-        else
-          puts "[fetch_trends_page] No data found on page #{page_number}. Ending scraping."
-          break
+      if page_data.any?
+        page_data.each do |item|
+          item[:line_number] = total_item_number
+          total_item_number += 1
+          all_data << item
         end
+        puts "[fetch_trends_page] Scraped data from page #{page_number}."
+      else
+        puts "[fetch_trends_page] No data found on page #{page_number}. Ending scraping."
+        break
+      end
   
-        # Handle pagination based on the presence of the Next button
-        if next_button_found
-          begin
-            next_buttons = driver.find_elements(css: 'button[aria-label="Next"]')
+      # Handle pagination based on the presence of the Next button
+      if next_button_found
+        begin
+          next_buttons = driver.find_elements(css: 'button[aria-label="Next"]')
   
-            if next_buttons.any?
-              next_button = next_buttons.last
-              if next_button.displayed? && next_button.enabled?
-                driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
-                wait.until { next_button.displayed? && next_button.enabled? }
-                next_button.click
-                wait.until { driver.execute_script("return document.readyState") == "complete" }
-                page_number += 1
-              else
-                puts "[fetch_trends_page] Next button is present but not clickable. Ending pagination."
-                break
-              end
+          if next_buttons.any?
+            next_button = next_buttons.last
+            if next_button.displayed? && next_button.enabled?
+              driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
+              wait.until { next_button.displayed? && next_button.enabled? }
+              next_button.click
+              wait.until { driver.execute_script("return document.readyState") == "complete" }
+              page_number += 1
             else
-              puts "[fetch_trends_page] No more 'Next' buttons found, ending pagination."
+              puts "[fetch_trends_page] Next button is present but not clickable. Ending pagination."
               break
             end
-          rescue Selenium::WebDriver::Error::NoSuchElementError
-            puts "[fetch_trends_page] No 'Next' button found, ending pagination."
+          else
+            puts "[fetch_trends_page] No more 'Next' buttons found, ending pagination."
             break
-          rescue Selenium::WebDriver::Error::ElementClickInterceptedError
-            puts "[fetch_trends_page] Element click intercepted, trying to handle overlay or obstruction."
           end
-        else
+        rescue Selenium::WebDriver::Error::NoSuchElementError
           puts "[fetch_trends_page] No 'Next' button found, ending pagination."
           break
+        rescue Selenium::WebDriver::Error::ElementClickInterceptedError
+          puts "[fetch_trends_page] Element click intercepted, trying to handle overlay or obstruction."
         end
+      else
+        puts "[fetch_trends_page] No 'Next' button found, ending pagination."
+        break
       end
     end
   
     all_data
   end
-  
   
   # Scroll down the page until no new content appears
   def scroll_down_until_no_new_content(driver)
@@ -145,7 +120,7 @@ class GoogleTrendsScraper
     while scroll_attempts < max_scroll_attempts
       # Scroll to the bottom of the page
       driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-      sleep(rand(2.0..3.0)) # Give time for lazy-loaded content to load
+      sleep(rand(1.0..1.5)) # Give time for lazy-loaded content to load
 
       new_height = driver.execute_script("return document.body.scrollHeight")
       if new_height == previous_height
@@ -172,6 +147,7 @@ class GoogleTrendsScraper
       end
   
       related_queries_container = trends_widgets.css('div.fe-related-queries.fe-atoms-generic-container')
+  
   
       if related_queries_container.empty?
         puts "[parse_trends_page] No 'fe-related-queries' container found within the 'RELATED_QUERIES' widget."
@@ -237,9 +213,7 @@ class GoogleTrendsScraper
           csv << ["Query", "Line Number", "Seed", "Link", "Rising Value", "idType", "tagType", "Date"]
         end
         data.each do |entry|
-          # Ensure idType is handled as an integer and not a float
-          id_type_value = query[:idType].to_i
-          csv << [query[:tag].upcase, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], id_type_value, query[:tagType], current_date]
+          csv << [query[:tag].upcase, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], query[:idType].to_i, query[:tagType], current_date]
         end
       end
       puts "[append_to_combined_csv] CSV file '#{combined_filename}' updated successfully."
@@ -262,9 +236,7 @@ class GoogleTrendsScraper
       CSV.open(filepath, "wb", headers: true) do |csv|
         csv << ["Query", "Line Number", "Seed", "Link", "Rising Value", "idType", "tagType", "Date"]
         data.each do |entry|
-          # Ensure idType is handled as an integer and not a float
-          id_type_value = query[:idType].to_i
-          csv << [query[:tag], entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], id_type_value, query[:tagType], current_date]
+          csv << [query[:tag], entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], query[:idType].to_i, query[:tagType], current_date]
         end
       end
       puts "[write_to_csv] CSV file '#{filename}' written successfully."
@@ -277,23 +249,24 @@ class GoogleTrendsScraper
     end
   end
 
- # Method to fetch and export trends data
   def fetch_and_export_trends(queries, pick_date = '201-d', max_pages = 5)
     options = Selenium::WebDriver::Chrome::Options.new
     user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36'
     options.add_argument("user-agent=#{user_agent}")
-
-    @driver = Selenium::WebDriver.for :chrome, options: options
-    @wait = Selenium::WebDriver::Wait.new(timeout: 20)
-
+  
     successful_scrapes = 0
     unsuccessful_scrapes = 0
-
+  
+    # Iterate over the queries in batches
     queries.each_slice(rand(5..8)).with_index do |query_batch, index|
+      # Open a new browser instance for each batch of queries
+      @driver = Selenium::WebDriver.for :chrome, options: options
+      @wait = Selenium::WebDriver::Wait.new(timeout: 20)
+  
       query_batch.each do |query|
         filename = "#{query[:tag].parameterize}.csv"
         data = fetch_trends_pages(@driver, @wait, query, pick_date, max_pages)
-
+  
         if data.any?
           successful_scrapes += 1
           write_to_csv(data, filename, query)
@@ -304,33 +277,21 @@ class GoogleTrendsScraper
           puts "[fetch_and_export_trends] No data found to write to the CSV for query: #{query[:tag]}."
         end
       end
-
-      if (index + 1) < (queries.size / query_batch.size.to_f).ceil
-        @driver.navigate.refresh
-        @driver.execute_script("window.open('about:blank', '_blank');")
-
-        new_tab_handle = @driver.window_handles.last
-        old_tab_handle = @driver.window_handles.first
-
-        @driver.switch_to.window(new_tab_handle)
-
-        if old_tab_handle != new_tab_handle
-          @driver.switch_to.window(old_tab_handle)
-          @driver.close
-        end
-        @driver.switch_to.window(new_tab_handle)
-
-        change_vpn_location
-
-        @driver.navigate.refresh
-      end
+  
+      # Close the current browser
+      @driver.quit
+      puts "[fetch_and_export_trends] Browser closed after batch #{index + 1}."
+  
+      # Change VPN location before opening a new browser instance
+      change_vpn_location
+  
+      puts "[fetch_and_export_trends] Opening new browser for next batch."
     end
-
-    @driver.quit
+  
     puts "[fetch_and_export_trends] Total successful scrapes: #{successful_scrapes}"
     puts "[fetch_and_export_trends] Total unsuccessful scrapes: #{unsuccessful_scrapes}"
   end
-
+  
   # Method to change VPN location by running the AppleScript
   def change_vpn_location
     begin
