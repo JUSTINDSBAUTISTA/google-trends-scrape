@@ -10,105 +10,131 @@ class GoogleTrendsScraper
     @driver = nil
     @wait = nil
     @first_reload_done = false # Initialize flag to track the first reload
+    @zipfile_path = Rails.root.join('public', 'trends_data.zip') # Store the zip file path globally
   end
 
-  def create_zip_from_csv_files(queries)
-    zipfile_name = Rails.root.join('public', 'trends_data.zip')
+  def add_to_zip_file(query)
+    # Exclude the combined CSV file
+    combined_filename = "#{Date.today.strftime("%B_%d_%Y")}.csv"
+    
+    filename = "#{query[:tag].parameterize}.csv"
+    csv_filepath = Rails.root.join('public', filename)
 
-    begin
-      Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
-        queries.each do |query|
-          filename = "#{query.parameterize}.csv"
-          csv_filepath = Rails.root.join('public', filename)
-
-          # Only include the CSV file if it exists
-          if File.exist?(csv_filepath)
+    if File.exist?(csv_filepath) && filename != combined_filename
+      begin
+        Zip::File.open(@zipfile_path, Zip::File::CREATE) do |zipfile|
+          unless zipfile.find_entry(filename)
             zipfile.add(filename, csv_filepath)
-            puts "\n"
-            puts "File that is found for query: #{query} is added to the ZIP file."
-            puts "_" * 60
-          else
-            puts "\n"
-            puts "File not found for query: #{query}"
-          end 
+            puts "[add_to_zip_file] Added file #{filename} to the ZIP file."
+          end
         end
+      rescue => e
+        puts "[add_to_zip_file] Error adding to ZIP file: #{e.message}"
       end
-      puts "\n"
-      puts "_" * 60
-      puts "\n"
-      puts "ZIP file 'trends_data.zip' created successfully."
-    rescue => e
-      puts "Error creating ZIP file: #{e.message}"
+    else
+      puts "[add_to_zip_file] File #{filename} not found or it is the combined file. Skipping."
     end
   end
 
-  # Fetch the Google Trends page with pagination logic
   def fetch_trends_pages(driver, wait, query, pick_date, max_pages = 5)
     # Use the tag in the Google Trends URL for search query
     tag = query[:tag]
-    driver.navigate.to("https://trends.google.com/trends/explore?q=#{tag}&date=now%#{pick_date}&geo=US&hl=en-US")
-
-    # Wait for the page to load completely
-    wait.until { driver.execute_script("return document.readyState") == "complete" }
-    sleep(rand(2.0..3.0))
+    url = "https://trends.google.com/trends/explore?q=#{tag}&date=now%#{pick_date}&geo=US&hl=en-US"
   
-    all_data = []
-    page_number = 1
-    total_item_number = 1  # To keep track of global line numbers
+    # Variables to handle retry for 429 error
+    max_retries = 3
+    retry_count = 0
+    success = false
   
-    scroll_down_until_no_new_content(driver)
-    
-    while page_number <= max_pages
-      html = driver.page_source
-      page_data, next_button_found = parse_trends_page(html)
+    begin
+      driver.navigate.to(url)
   
-      if page_data.any?
-        page_data.each do |item|
-          item[:line_number] = total_item_number
-          total_item_number += 1
-          all_data << item
-        end
-        puts "[fetch_trends_page] Scraped data from page #{page_number}."
+      # Wait for the page to load completely
+      wait.until { driver.execute_script("return document.readyState") == "complete" }
+      sleep(rand(2.0..3.0))
+  
+      # Check if the page returned a 429 error
+      page_status = driver.execute_script("return document.readyState")
+      
+      if page_status == "429"
+        raise "Too Many Requests (429)"
       else
-        puts "[fetch_trends_page] No data found on page #{page_number}. Ending scraping."
-        break
+        success = true
       end
   
-      # Handle pagination based on the presence of the Next button
-      if next_button_found
-        begin
-          next_buttons = driver.find_elements(css: 'button[aria-label="Next"]')
+    rescue => e
+      if e.message.include?('429') && retry_count < max_retries
+        retry_count += 1
+        puts "[fetch_trends_pages] Received 429 error. Retrying... (Attempt #{retry_count})"
+        sleep(5)  # Delay before retrying, adjust the time as necessary
+        retry  # Retry the block
+      else
+        puts "[fetch_trends_pages] Error loading page or too many retries: #{e.message}"
+        return []  # Return empty array if the retries failed
+      end
+    end
   
-          if next_buttons.any?
-            next_button = next_buttons.last
-            if next_button.displayed? && next_button.enabled?
-              driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
-              wait.until { next_button.displayed? && next_button.enabled? }
-              next_button.click
-              wait.until { driver.execute_script("return document.readyState") == "complete" }
-              page_number += 1
+    if success
+      # Proceed with scraping once the page is successfully loaded
+      all_data = []
+      page_number = 1
+      total_item_number = 1  # To keep track of global line numbers
+  
+      scroll_down_until_no_new_content(driver)
+  
+      while page_number <= max_pages
+        html = driver.page_source
+        page_data, next_button_found = parse_trends_page(html)
+  
+        if page_data.any?
+          page_data.each do |item|
+            item[:line_number] = total_item_number
+            total_item_number += 1
+            all_data << item
+          end
+          puts "[fetch_trends_page] Scraped data from page #{page_number}."
+        else
+          puts "[fetch_trends_page] No data found on page #{page_number}. Ending scraping."
+          break
+        end
+  
+        # Handle pagination based on the presence of the Next button
+        if next_button_found
+          begin
+            next_buttons = driver.find_elements(css: 'button[aria-label="Next"]')
+  
+            if next_buttons.any?
+              next_button = next_buttons.last
+              if next_button.displayed? && next_button.enabled?
+                driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
+                wait.until { next_button.displayed? && next_button.enabled? }
+                next_button.click
+                wait.until { driver.execute_script("return document.readyState") == "complete" }
+                page_number += 1
+              else
+                puts "[fetch_trends_page] Next button is present but not clickable. Ending pagination."
+                break
+              end
             else
-              puts "[fetch_trends_page] Next button is present but not clickable. Ending pagination."
+              puts "[fetch_trends_page] No more 'Next' buttons found, ending pagination."
               break
             end
-          else
-            puts "[fetch_trends_page] No more 'Next' buttons found, ending pagination."
+          rescue Selenium::WebDriver::Error::NoSuchElementError
+            puts "[fetch_trends_page] No 'Next' button found, ending pagination."
             break
+          rescue Selenium::WebDriver::Error::ElementClickInterceptedError
+            puts "[fetch_trends_page] Element click intercepted, trying to handle overlay or obstruction."
           end
-        rescue Selenium::WebDriver::Error::NoSuchElementError
+        else
           puts "[fetch_trends_page] No 'Next' button found, ending pagination."
           break
-        rescue Selenium::WebDriver::Error::ElementClickInterceptedError
-          puts "[fetch_trends_page] Element click intercepted, trying to handle overlay or obstruction."
         end
-      else
-        puts "[fetch_trends_page] No 'Next' button found, ending pagination."
-        break
       end
     end
   
     all_data
   end
+  
   
   # Scroll down the page until no new content appears
   def scroll_down_until_no_new_content(driver)
@@ -205,18 +231,20 @@ class GoogleTrendsScraper
     current_date = Date.today.strftime('%Y-%m-%d')
 
     begin
-      CSV.open(filepath, "a+") do |csv|
+      CSV.open(filepath, "a+", headers: true) do |csv|
         if csv.count.zero?
           # Add headers only if the file is empty (newly created)
           csv << ["Query", "Line Number", "Seed", "Link", "Rising Value", "idType", "tagType", "Date"]
         end
         data.each do |entry|
-          csv << [query[:tag].upcase, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], query[:idType], query[:tagType], current_date]
+          # Ensure idType is handled as an integer and not a float
+          id_type_value = query[:idType].to_i
+          csv << [query[:tag].upcase, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], id_type_value, query[:tagType], current_date]
         end
       end
-      puts "[append_to_combined_csv] CSV file 'all_trends_data.csv' updated successfully."
+      puts "[append_to_combined_csv] CSV file '#{combined_filename}' updated successfully."
     rescue => e
-      puts "[append_to_combined_csv] Error writing to combined CSV file 'all_trends_data.csv': #{e.message}"
+      puts "[append_to_combined_csv] Error writing to combined CSV file '#{combined_filename}': #{e.message}"
     end
   end
 
@@ -231,19 +259,25 @@ class GoogleTrendsScraper
     current_date = Date.today.strftime('%Y-%m-%d')
 
     begin
-      CSV.open(filepath, "wb") do |csv|
+      CSV.open(filepath, "wb", headers: true) do |csv|
         csv << ["Query", "Line Number", "Seed", "Link", "Rising Value", "idType", "tagType", "Date"]
         data.each do |entry|
-          csv << [query[:tag], entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], query[:idType], query[:tagType], current_date]
+          # Ensure idType is handled as an integer and not a float
+          id_type_value = query[:idType].to_i
+          csv << [query[:tag], entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], id_type_value, query[:tagType], current_date]
         end
       end
       puts "[write_to_csv] CSV file '#{filename}' written successfully."
+
+      # Immediately add the written CSV to the zip file
+      add_to_zip_file(query)
+
     rescue => e
       puts "[write_to_csv] Error writing CSV file '#{filename}': #{e.message}"
     end
   end
 
-  # Main method to fetch and export trends
+ # Method to fetch and export trends data
   def fetch_and_export_trends(queries, pick_date = '201-d', max_pages = 5)
     options = Selenium::WebDriver::Chrome::Options.new
     user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36'
@@ -272,7 +306,6 @@ class GoogleTrendsScraper
       end
 
       if (index + 1) < (queries.size / query_batch.size.to_f).ceil
-        change_vpn_location
         @driver.navigate.refresh
         @driver.execute_script("window.open('about:blank', '_blank');")
 
@@ -286,11 +319,14 @@ class GoogleTrendsScraper
           @driver.close
         end
         @driver.switch_to.window(new_tab_handle)
+
+        change_vpn_location
+
+        @driver.navigate.refresh
       end
     end
 
     @driver.quit
-    create_zip_from_csv_files(queries.map { |query| query[:tag] })
     puts "[fetch_and_export_trends] Total successful scrapes: #{successful_scrapes}"
     puts "[fetch_and_export_trends] Total unsuccessful scrapes: #{unsuccessful_scrapes}"
   end
@@ -301,9 +337,34 @@ class GoogleTrendsScraper
       puts "[change_vpn_location] Changing VPN location..."
       # Assuming your AppleScript is saved as change_vpn_location.scpt in the project root
       system("osascript #{Rails.root.join('location_handler.scpt')}")
+
+      sleep(2)
+
       puts "[change_vpn_location] VPN location changed successfully."
+
+
+      # Fetch and print the current public IP address
+      current_ip = fetch_current_ip
+      puts "[change_vpn_location] Current IP address: #{current_ip}"
+
     rescue => e
       puts "[change_vpn_location] Error changing VPN location: #{e.message}"
     end
   end
+
+    # Helper method to fetch the current public IP address
+    def fetch_current_ip
+      begin
+        uri = URI.parse("https://api.ipify.org")
+        response = Net::HTTP.get_response(uri)
+        if response.is_a?(Net::HTTPSuccess)
+          response.body
+        else
+          "Unable to fetch IP address"
+        end
+      rescue => e
+        "Error fetching IP address: #{e.message}"
+      end
+    end
+
 end

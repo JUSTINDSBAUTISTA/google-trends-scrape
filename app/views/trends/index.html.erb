@@ -3,13 +3,13 @@
     <div class="col-md-6">
       <div class="card shadow-sm">
         <div class="card-body">
-          <h1 class="card-title text-center mb-4">Fetch Google Trends Data</h1>
+          <h1 class="card-title text-center mb-4">Import and fetch Google Trend</h1>
 
           <!-- Link to Download Combined CSV File -->
           <div class="text-right mb-3">
-            <% combined_file = Rails.root.join('public', 'all_trends_data.csv') %>
+            <% combined_file = Rails.root.join('public', "#{@current_date_str}.csv") %>
             <% if File.exist?(combined_file) %>
-              <%= link_to "Download All Trends Data", "/all_trends_data.csv", class: 'btn btn-link', download: "all_trends_data.csv" %>
+              <%= link_to "Download All Trends Data", "/#{@current_date_str}.csv", class: 'btn btn-link', download: "#{@current_date_str}.csv" %>
             <% end %>
           </div>
 
