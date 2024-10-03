@@ -49,7 +49,7 @@ class GoogleTrendsScraper
   
     # Wait for the page to reload completely after refresh
     wait.until { driver.execute_script("return document.readyState") == "complete" }
-    sleep(rand(2.0..3.0))
+    sleep(rand(1.75..2.00))
   
  
     # Proceed with scraping once the page is successfully loaded
@@ -120,7 +120,7 @@ class GoogleTrendsScraper
     while scroll_attempts < max_scroll_attempts
       # Scroll to the bottom of the page
       driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-      sleep(rand(1.0..1.5)) # Give time for lazy-loaded content to load
+      sleep(1) # Give time for lazy-loaded content to load
 
       new_height = driver.execute_script("return document.body.scrollHeight")
       if new_height == previous_height
