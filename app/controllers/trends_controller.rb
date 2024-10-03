@@ -38,7 +38,7 @@ class TrendsController < ApplicationController
         end
 
         # Distribute queries in random slices and enqueue Sidekiq jobs
-        queries.each_slice(rand(4..6)).with_index do |query_batch, index|
+        queries.each_slice(rand(3..5)).with_index do |query_batch, index|
           GoogleTrendsScrapingJob.perform_later(query_batch, pick_date, 5)  # Enqueue the job with Sidekiq
           puts "[fetch_trends] Enqueued job #{index + 1} with #{query_batch.size} queries."
         end
