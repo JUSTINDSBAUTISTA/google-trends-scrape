@@ -4,9 +4,11 @@ require 'redis'
 class GoogleTrendsScrapingJob < ApplicationJob
   queue_as :default
 
-  REDIS_KEY = 'google_trends_workers_done'
+  REDIS_SUCCESS_KEY = 'total_successful_scrapes'
+  REDIS_UNSUCCESS_KEY = 'total_unsuccessful_scrapes'
+  REDIS_WORKERS_KEY = 'google_trends_workers_done'
 
-  def perform(query_batch, pick_date, max_pages, total_workers = 5)
+  def perform(query_batch, pick_date, max_pages, total_workers = 7)
     redis = Redis.new
     begin
       # Log the start time
@@ -51,7 +53,7 @@ class GoogleTrendsScrapingJob < ApplicationJob
       puts "[GoogleTrendsScrapingJob] Browser closed for this batch."
 
       # Increment the Redis counter for completed workers
-      workers_done = redis.incr(REDIS_KEY)
+      workers_done = redis.incr(REDIS_WORKERS_KEY)
       puts "[GoogleTrendsScrapingJob] Workers completed: #{workers_done}/#{total_workers}"
 
       # Log the start and end times, calculate the duration
@@ -64,29 +66,25 @@ class GoogleTrendsScrapingJob < ApplicationJob
       puts "[GoogleTrendsScrapingJob] Successful scrapes: #{successful_scrapes}"
       puts "[GoogleTrendsScrapingJob] Unsuccessful scrapes: #{unsuccessful_scrapes}"
 
+      # Accumulate successful and unsuccessful scrapes across all batches in Redis
+      redis.incrby(REDIS_SUCCESS_KEY, successful_scrapes)
+      redis.incrby(REDIS_UNSUCCESS_KEY, unsuccessful_scrapes)
+
       # Change VPN only when the last worker of the batch finishes
       if workers_done >= total_workers
         # Reset the counter for future runs
-        redis.del(REDIS_KEY)
+        redis.del(REDIS_WORKERS_KEY)
 
         # Change VPN only once, after all workers have finished
         GoogleTrendsScraper.new.change_vpn_location
         puts "[GoogleTrendsScrapingJob] VPN changed after all workers in the batch."
 
-        # Log total success and failure counts across all workers
-        total_successful_scrapes = redis.get('successful_scrapes').to_i
-        total_unsuccessful_scrapes = redis.get('unsuccessful_scrapes').to_i
-        puts "[GoogleTrendsScrapingJob] Overall Summary:"
+        # Log total success and failure counts across all workers and batches
+        total_successful_scrapes = redis.get(REDIS_SUCCESS_KEY).to_i
+        total_unsuccessful_scrapes = redis.get(REDIS_UNSUCCESS_KEY).to_i
+        puts "[GoogleTrendsScrapingJob] Overall Summary for All Batches:"
         puts "[GoogleTrendsScrapingJob] Total Successful scrapes: #{total_successful_scrapes}"
         puts "[GoogleTrendsScrapingJob] Total Unsuccessful scrapes: #{total_unsuccessful_scrapes}"
-
-        # Reset total scrapes counters for next batches
-        redis.del('successful_scrapes')
-        redis.del('unsuccessful_scrapes')
-      else
-        # Update total successful and unsuccessful scrape counts in Redis
-        redis.incrby('successful_scrapes', successful_scrapes)
-        redis.incrby('unsuccessful_scrapes', unsuccessful_scrapes)
       end
     rescue => e
       puts "[GoogleTrendsScrapingJob] Error during job execution: #{e.message}"
