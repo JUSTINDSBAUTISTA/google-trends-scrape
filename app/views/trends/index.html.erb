@@ -3,13 +3,13 @@
     <div class="col-md-6">
       <div class="card shadow-sm">
         <div class="card-body">
-          <h1 class="card-title text-center mb-4">Fetch Google Trends Data</h1>
+          <h1 class="card-title text-center mb-4">Import and fetch Google Trend</h1>
 
           <!-- Link to Download Combined CSV File -->
           <div class="text-right mb-3">
-            <% combined_file = Rails.root.join('public', 'all_trends_data.csv') %>
+            <% combined_file = Rails.root.join('public', "#{@current_date_str}.csv") %>
             <% if File.exist?(combined_file) %>
-              <%= link_to "Download All Trends Data", "/all_trends_data.csv", class: 'btn btn-link', download: "all_trends_data.csv" %>
+              <%= link_to "Download All Trends Data", "/#{@current_date_str}.csv", class: 'btn btn-link', download: "#{@current_date_str}.csv" %>
             <% end %>
           </div>
 
@@ -21,12 +21,13 @@
             <% end %>
           </div>
 
-          <!-- Form for Fetching Google Trends Data -->
-          <%= form_with url: fetch_trends_trends_path, method: :post, local: true, class: 'form' do |form| %>
+          <!-- Form for Uploading CSV and Selecting Date -->
+          <%= form_with url: fetch_trends_trends_path, method: :post, local: true, class: 'form', multipart: true do |form| %>
             <div class="mb-3">
-              <%= form.label :queries, "Enter search queries (comma separated)", class: "form-label" %>
-              <%= form.text_field :queries, class: "form-control", placeholder: "e.g., 'star wars, philipines, japan'" %>
+              <%= form.label :file, "Upload CSV File", class: "form-label" %>
+              <%= form.file_field :file, class: "form-control" %>
             </div>
+
             <div class="mb-3">
               <%= form.label :pick_date, "Select Date Range", class: "form-label" %>
               <%= form.select :pick_date, options_for_select([['Past 1 Hour', '201-H'], 
@@ -36,7 +37,6 @@
                                                               ['Past 30 Days', '201-m'], 
                                                               ['Past 90 Days', '203-m']]), {}, {class: "form-control"} %>
             </div>
-
 
             <div class="text-center">
               <%= form.submit "Fetch Trends", class: "btn btn-primary" %>

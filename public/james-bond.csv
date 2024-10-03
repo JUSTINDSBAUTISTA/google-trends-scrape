@@ -1,21 +1,26 @@
-Query,Line Number,Seed,Link,Rising Value,Date
- James Bond,1,Judi dench,https://trends.google.ca/trends/explore?q=judi+dench&date=now+7-d&geo=CA,Breakout,2024-10-01
- James Bond,2,When is the next james bond movie,https://trends.google.ca/trends/explore?q=when+is+the+next+james+bond+movie&date=now+7-d&geo=CA,Breakout,2024-10-01
- James Bond,3,123movies,https://trends.google.ca/trends/explore?q=123movies&date=now+7-d&geo=CA,Breakout,2024-10-01
- James Bond,4,James bond ornithologue,https://trends.google.ca/trends/explore?q=james+bond+ornithologue&date=now+7-d&geo=CA,Breakout,2024-10-01
- James Bond,5,Is james bond dead,https://trends.google.ca/trends/explore?q=is+james+bond+dead&date=now+7-d&geo=CA,Breakout,2024-10-01
- James Bond,6,James bond license to kill,https://trends.google.ca/trends/explore?q=james+bond+license+to+kill&date=now+7-d&geo=CA,Breakout,2024-10-01
- James Bond,7,James bond movies in chronological order,https://trends.google.ca/trends/explore?q=james+bond+movies+in+chronological+order&date=now+7-d&geo=CA,Breakout,2024-10-01
- James Bond,8,Toby stephens james bond,https://trends.google.ca/trends/explore?q=toby+stephens+james+bond&date=now+7-d&geo=CA,Breakout,2024-10-01
- James Bond,9,James bond ornithologist,https://trends.google.ca/trends/explore?q=james+bond+ornithologist&date=now+7-d&geo=CA,Breakout,2024-10-01
- James Bond,10,Radiohead james bond,https://trends.google.ca/trends/explore?q=radiohead+james+bond&date=now+7-d&geo=CA,Breakout,2024-10-01
- James Bond,11,James bond 007 full movie,https://trends.google.ca/trends/explore?q=james+bond+007+full+movie&date=now+7-d&geo=CA,Breakout,2024-10-01
- James Bond,12,M dans james bond,https://trends.google.ca/trends/explore?q=m+dans+james+bond&date=now+7-d&geo=CA,Breakout,2024-10-01
- James Bond,13,Films de la série james bond,https://trends.google.ca/trends/explore?q=films+de+la+s%C3%A9rie+james+bond&date=now+7-d&geo=CA,"+4,300%",2024-10-01
- James Bond,14,Maggie smith james bond,https://trends.google.ca/trends/explore?q=maggie+smith+james+bond&date=now+7-d&geo=CA,"+3,100%",2024-10-01
- James Bond,15,Billie eilish,https://trends.google.ca/trends/explore?q=billie+eilish&date=now+7-d&geo=CA,+550%,2024-10-01
- James Bond,16,Sam smith james bond,https://trends.google.ca/trends/explore?q=sam+smith+james+bond&date=now+7-d&geo=CA,+400%,2024-10-01
- James Bond,17,Judi dench james bond,https://trends.google.ca/trends/explore?q=judi+dench+james+bond&date=now+7-d&geo=CA,+350%,2024-10-01
- James Bond,18,Billie eilish james bond,https://trends.google.ca/trends/explore?q=billie+eilish+james+bond&date=now+7-d&geo=CA,+300%,2024-10-01
- James Bond,19,Adele james bond,https://trends.google.ca/trends/explore?q=adele+james+bond&date=now+7-d&geo=CA,+250%,2024-10-01
- James Bond,20,James mcavoy,https://trends.google.ca/trends/explore?q=james+mcavoy&date=now+7-d&geo=CA,+200%,2024-10-01
+Query,Line Number,Seed,Link,Rising Value,idType,tagType,Date
+James Bond,1,Shiva,https://trends.google.ca/trends/explore?q=shiva&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,2,Venus de milo shiva,https://trends.google.ca/trends/explore?q=venus+de+milo+shiva&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,3,Shiva movie,https://trends.google.ca/trends/explore?q=shiva+movie&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,4,Shiva meaning,https://trends.google.ca/trends/explore?q=shiva+meaning&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,5,Venus de milo movie,https://trends.google.ca/trends/explore?q=venus+de+milo+movie&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,6,Taxi driver,https://trends.google.ca/trends/explore?q=taxi+driver&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,7,Venus de milo meaning,https://trends.google.ca/trends/explore?q=venus+de+milo+meaning&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,8,Heat,https://trends.google.ca/trends/explore?q=heat&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,9,Movie taxi driver,https://trends.google.ca/trends/explore?q=movie+taxi+driver&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,10,Octopus movie,https://trends.google.ca/trends/explore?q=octopus+movie&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,11,Heat movie,https://trends.google.ca/trends/explore?q=heat+movie&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,12,Joker movie,https://trends.google.ca/trends/explore?q=joker+movie&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,13,Robert de niro,https://trends.google.ca/trends/explore?q=robert+de+niro&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,14,Robert de niro movies,https://trends.google.ca/trends/explore?q=robert+de+niro+movies&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,15,De niro movies,https://trends.google.ca/trends/explore?q=de+niro+movies&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,16,Octopus casino,https://trends.google.ca/trends/explore?q=octopus+casino&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,17,Connections hint,https://trends.google.ca/trends/explore?q=connections+hint&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,18,Julienne meaning,https://trends.google.ca/trends/explore?q=julienne+meaning&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,19,Taxi driver meaning,https://trends.google.ca/trends/explore?q=taxi+driver+meaning&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,20,Octopus meaning,https://trends.google.ca/trends/explore?q=octopus+meaning&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,21,Shiva arms,https://trends.google.ca/trends/explore?q=shiva+arms&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,22,Heat meaning,https://trends.google.ca/trends/explore?q=heat+meaning&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,23,Connections nyt,https://trends.google.ca/trends/explore?q=connections+nyt&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,24,Shiva definition,https://trends.google.ca/trends/explore?q=shiva+definition&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02
+James Bond,25,Julienne movie,https://trends.google.ca/trends/explore?q=julienne+movie&date=now+1-d&geo=US,Breakout,217,Franchise,2024-10-02

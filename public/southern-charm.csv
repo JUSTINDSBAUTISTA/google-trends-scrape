@@ -1,4 +1,14 @@
-Query,Line Number,Seed,Link,Rising Value,Date
- Southern Charm,1,When is southern charm coming back,https://trends.google.ca/trends/explore?q=when+is+southern+charm+coming+back&date=now+1-d&geo=CA,Breakout,2024-10-01
- Southern Charm,2,Southern charm new season,https://trends.google.ca/trends/explore?q=southern+charm+new+season&date=now+1-d&geo=CA,+190%,2024-10-01
- Southern Charm,3,Southern charm season 10,https://trends.google.ca/trends/explore?q=southern+charm+season+10&date=now+1-d&geo=CA,+150%,2024-10-01
+Query,Line Number,Seed,Link,Rising Value,idType,tagType,Date
+Southern Charm,1,Southern charm at the farm,https://trends.google.ca/trends/explore?q=southern+charm+at+the+farm&date=now+1-d&geo=US,Breakout,216,TV Show,2024-10-02
+Southern Charm,2,Southern charm cafe,https://trends.google.ca/trends/explore?q=southern+charm+cafe&date=now+1-d&geo=US,+250%,216,TV Show,2024-10-02
+Southern Charm,3,Chelsea southern charm,https://trends.google.ca/trends/explore?q=chelsea+southern+charm&date=now+1-d&geo=US,+190%,216,TV Show,2024-10-02
+Southern Charm,4,Jd southern charm,https://trends.google.ca/trends/explore?q=jd+southern+charm&date=now+1-d&geo=US,+120%,216,TV Show,2024-10-02
+Southern Charm,5,Paige desorbo,https://trends.google.ca/trends/explore?q=paige+desorbo&date=now+1-d&geo=US,+80%,216,TV Show,2024-10-02
+Southern Charm,6,Craig conover,https://trends.google.ca/trends/explore?q=craig+conover&date=now+1-d&geo=US,+80%,216,TV Show,2024-10-02
+Southern Charm,7,Shep rose,https://trends.google.ca/trends/explore?q=shep+rose&date=now+1-d&geo=US,+70%,216,TV Show,2024-10-02
+Southern Charm,8,Real housewives of new york,https://trends.google.ca/trends/explore?q=real+housewives+of+new+york&date=now+1-d&geo=US,+70%,216,TV Show,2024-10-02
+Southern Charm,9,Danni southern charm,https://trends.google.ca/trends/explore?q=danni+southern+charm&date=now+1-d&geo=US,+60%,216,TV Show,2024-10-02
+Southern Charm,10,Thomas ravenel,https://trends.google.ca/trends/explore?q=thomas+ravenel&date=now+1-d&geo=US,+50%,216,TV Show,2024-10-02
+Southern Charm,11,Southern charm season 1,https://trends.google.ca/trends/explore?q=southern+charm+season+1&date=now+1-d&geo=US,+50%,216,TV Show,2024-10-02
+Southern Charm,12,Southern charm wax,https://trends.google.ca/trends/explore?q=southern+charm+wax&date=now+1-d&geo=US,+50%,216,TV Show,2024-10-02
+Southern Charm,13,Sweet southern charm,https://trends.google.ca/trends/explore?q=sweet+southern+charm&date=now+1-d&geo=US,+50%,216,TV Show,2024-10-02

@@ -1,8 +1,25 @@
-Query,Line Number,Seed,Link,Rising Value,Date
- South Park,1,1333 south park street,https://trends.google.ca/trends/explore?q=1333+south+park+street&date=now+1-d&geo=CA,Breakout,2024-10-01
- South Park,2,South park clinic,https://trends.google.ca/trends/explore?q=south+park+clinic&date=now+1-d&geo=CA,Breakout,2024-10-01
- South Park,3,1030 south park street,https://trends.google.ca/trends/explore?q=1030+south+park+street&date=now+1-d&geo=CA,+250%,2024-10-01
- South Park,4,Kruger national park,https://trends.google.ca/trends/explore?q=kruger+national+park&date=now+1-d&geo=CA,+130%,2024-10-01
- South Park,5,Stan south park,https://trends.google.ca/trends/explore?q=stan+south+park&date=now+1-d&geo=CA,+120%,2024-10-01
- South Park,6,South valley park,https://trends.google.ca/trends/explore?q=south+valley+park&date=now+1-d&geo=CA,+90%,2024-10-01
- South Park,7,South park mexican,https://trends.google.ca/trends/explore?q=south+park+mexican&date=now+1-d&geo=CA,+40%,2024-10-01
+Query,Line Number,Seed,Link,Rising Value,idType,tagType,Date
+South Park,1,Sarah jessica parker south park,https://trends.google.ca/trends/explore?q=sarah+jessica+parker+south+park&date=now+1-d&geo=US,Breakout,216,TV Show,2024-10-02
+South Park,2,Wendy from south park,https://trends.google.ca/trends/explore?q=wendy+from+south+park&date=now+1-d&geo=US,+550%,216,TV Show,2024-10-02
+South Park,3,South park giant douche,https://trends.google.ca/trends/explore?q=south+park+giant+douche&date=now+1-d&geo=US,+400%,216,TV Show,2024-10-02
+South Park,4,South park live action,https://trends.google.ca/trends/explore?q=south+park+live+action&date=now+1-d&geo=US,+200%,216,TV Show,2024-10-02
+South Park,5,Kendrick south park,https://trends.google.ca/trends/explore?q=kendrick+south+park&date=now+1-d&geo=US,+200%,216,TV Show,2024-10-02
+South Park,6,South park movie 2024,https://trends.google.ca/trends/explore?q=south+park+movie+2024&date=now+1-d&geo=US,+200%,216,TV Show,2024-10-02
+South Park,7,Mr mackey south park,https://trends.google.ca/trends/explore?q=mr+mackey+south+park&date=now+1-d&geo=US,+150%,216,TV Show,2024-10-02
+South Park,8,South park season 25,https://trends.google.ca/trends/explore?q=south+park+season+25&date=now+1-d&geo=US,+150%,216,TV Show,2024-10-02
+South Park,9,Kendrick lamar south park,https://trends.google.ca/trends/explore?q=kendrick+lamar+south+park&date=now+1-d&geo=US,+150%,216,TV Show,2024-10-02
+South Park,10,Trapped in the closet south park,https://trends.google.ca/trends/explore?q=trapped+in+the+closet+south+park&date=now+1-d&geo=US,+140%,216,TV Show,2024-10-02
+South Park,11,Buona forchetta south park,https://trends.google.ca/trends/explore?q=buona+forchetta+south+park&date=now+1-d&geo=US,+130%,216,TV Show,2024-10-02
+South Park,12,Casa bonita denver,https://trends.google.ca/trends/explore?q=casa+bonita+denver&date=now+1-d&geo=US,+110%,216,TV Show,2024-10-02
+South Park,13,South park human centipede,https://trends.google.ca/trends/explore?q=south+park+human+centipede&date=now+1-d&geo=US,+110%,216,TV Show,2024-10-02
+South Park,14,South park not suitable for children,https://trends.google.ca/trends/explore?q=south+park+not+suitable+for+children&date=now+1-d&geo=US,+100%,216,TV Show,2024-10-02
+South Park,15,South park ozempic special,https://trends.google.ca/trends/explore?q=south+park+ozempic+special&date=now+1-d&geo=US,+90%,216,TV Show,2024-10-02
+South Park,16,Tolkien south park,https://trends.google.ca/trends/explore?q=tolkien+south+park&date=now+1-d&geo=US,+90%,216,TV Show,2024-10-02
+South Park,17,Sarabeth's central park south,https://trends.google.ca/trends/explore?q=sarabeth's+central+park+south&date=now+1-d&geo=US,+80%,216,TV Show,2024-10-02
+South Park,18,South llano river state park,https://trends.google.ca/trends/explore?q=south+llano+river+state+park&date=now+1-d&geo=US,+80%,216,TV Show,2024-10-02
+South Park,19,Hawthorne park south,https://trends.google.ca/trends/explore?q=hawthorne+park+south&date=now+1-d&geo=US,+80%,216,TV Show,2024-10-02
+South Park,20,Enterprise south nature park,https://trends.google.ca/trends/explore?q=enterprise+south+nature+park&date=now+1-d&geo=US,+70%,216,TV Show,2024-10-02
+South Park,21,Pip south park,https://trends.google.ca/trends/explore?q=pip+south+park&date=now+1-d&geo=US,+70%,216,TV Show,2024-10-02
+South Park,22,South park voice actors,https://trends.google.ca/trends/explore?q=south+park+voice+actors&date=now+1-d&geo=US,+60%,216,TV Show,2024-10-02
+South Park,23,Dell,https://trends.google.ca/trends/explore?q=dell&date=now+1-d&geo=US,+60%,216,TV Show,2024-10-02
+South Park,24,Hunters point south park,https://trends.google.ca/trends/explore?q=hunters+point+south+park&date=now+1-d&geo=US,+60%,216,TV Show,2024-10-02

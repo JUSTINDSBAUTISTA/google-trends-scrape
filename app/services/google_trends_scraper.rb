@@ -10,53 +10,55 @@ class GoogleTrendsScraper
     @driver = nil
     @wait = nil
     @first_reload_done = false # Initialize flag to track the first reload
+    @zipfile_path = Rails.root.join('public', 'trends_data.zip') # Store the zip file path globally
   end
 
-  def create_zip_from_csv_files(queries)
-    zipfile_name = Rails.root.join('public', 'trends_data.zip')
+  def add_to_zip_file(query)
+    # Exclude the combined CSV file
+    combined_filename = "#{Date.today.strftime("%B_%d_%Y")}.csv"
+    
+    filename = "#{query[:tag].parameterize}.csv"
+    csv_filepath = Rails.root.join('public', filename)
 
-    begin
-      Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
-        queries.each do |query|
-          filename = "#{query.parameterize}.csv"
-          csv_filepath = Rails.root.join('public', filename)
-
-          # Only include the CSV file if it exists
-          if File.exist?(csv_filepath)
+    if File.exist?(csv_filepath) && filename != combined_filename
+      begin
+        Zip::File.open(@zipfile_path, Zip::File::CREATE) do |zipfile|
+          unless zipfile.find_entry(filename)
             zipfile.add(filename, csv_filepath)
-            puts "\n"
-            puts "File that is found for query: #{query} is added to the ZIP file."
-            puts "_" * 60
-          else
-            puts "\n"
-            puts "File not found for query: #{query}"
-          end 
+            puts "[add_to_zip_file] Added file #{filename} to the ZIP file."
+          end
         end
+      rescue => e
+        puts "[add_to_zip_file] Error adding to ZIP file: #{e.message}"
       end
-      puts "\n"
-      puts "_" * 60
-      puts "\n"
-      puts "ZIP file 'trends_data.zip' created successfully."
-    rescue => e
-      puts "Error creating ZIP file: #{e.message}"
+    else
+      puts "[add_to_zip_file] File #{filename} not found or it is the combined file. Skipping."
     end
   end
 
-  # Fetch the Google Trends page with pagination logic
   def fetch_trends_pages(driver, wait, query, pick_date, max_pages = 5)
-    # Use the pick_date in the Google Trends URL
-    driver.navigate.to("https://trends.google.com/trends/explore?q=#{query}&date=now%#{pick_date}&geo=US&hl=en-US")
+    # Use the tag in the Google Trends URL for search query
+    tag = query[:tag]
+    url = "https://trends.google.com/trends/explore?q=#{tag}&date=now%#{pick_date}&geo=US&hl=en-US"
+    
+    # Navigate to the URL
+    driver.navigate.to(url)
   
-    # Wait for the page to load completely
+    # Refresh the page after navigating to the URL
+    driver.navigate.refresh
+  
+    # Wait for the page to reload completely after refresh
     wait.until { driver.execute_script("return document.readyState") == "complete" }
-    sleep(rand(2.0..3.0))
+    sleep(rand(1.75..2.00))
   
+ 
+    # Proceed with scraping once the page is successfully loaded
     all_data = []
     page_number = 1
     total_item_number = 1  # To keep track of global line numbers
   
     scroll_down_until_no_new_content(driver)
-    
+  
     while page_number <= max_pages
       html = driver.page_source
       page_data, next_button_found = parse_trends_page(html)
@@ -109,7 +111,6 @@ class GoogleTrendsScraper
     all_data
   end
   
-
   # Scroll down the page until no new content appears
   def scroll_down_until_no_new_content(driver)
     previous_height = driver.execute_script("return document.body.scrollHeight")
@@ -119,7 +120,7 @@ class GoogleTrendsScraper
     while scroll_attempts < max_scroll_attempts
       # Scroll to the bottom of the page
       driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-      sleep(rand(2.0..3.0)) # Give time for lazy-loaded content to load
+      sleep(1) # Give time for lazy-loaded content to load
 
       new_height = driver.execute_script("return document.body.scrollHeight")
       if new_height == previous_height
@@ -146,6 +147,7 @@ class GoogleTrendsScraper
       end
   
       related_queries_container = trends_widgets.css('div.fe-related-queries.fe-atoms-generic-container')
+  
   
       if related_queries_container.empty?
         puts "[parse_trends_page] No 'fe-related-queries' container found within the 'RELATED_QUERIES' widget."
@@ -188,32 +190,35 @@ class GoogleTrendsScraper
       return [], false
     end
   end
-  
-  
-  # Method to append data to a combined CSV file
+
+  # Method to append data to a combined CSV file with idType and tagType
   def append_to_combined_csv(data, query)
     if data.empty?
       puts "[append_to_combined_csv] No data available to append to the combined CSV file."
       return
     end
 
-    combined_filename = 'all_trends_data.csv' # Name of the combined CSV file
-    filepath = Rails.root.join('public', combined_filename) # Save file in the public directory
-    current_date = Date.today.strftime('%Y-%m-%d') # Get current date in YYYY-MM-DD format
+    # Get the current date formatted as 'Month_Date_Year'
+    current_date_str = Date.today.strftime("%B_%d_%Y")
+
+    # Dynamically rename the combined CSV file based on the current date
+    combined_filename = "#{current_date_str}.csv"
+    filepath = Rails.root.join('public', combined_filename)
+    current_date = Date.today.strftime('%Y-%m-%d')
 
     begin
-      CSV.open(filepath, "a+") do |csv|
+      CSV.open(filepath, "a+", headers: true) do |csv|
         if csv.count.zero?
           # Add headers only if the file is empty (newly created)
-          csv << ["Query", "Line Number", "Seed", "Link", "Rising Value", "Date"] # Add "Date" column
+          csv << ["Query", "Line Number", "Seed", "Link", "Rising Value", "idType", "tagType", "Date"]
         end
         data.each do |entry|
-          csv << [query.upcase, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
+          csv << [query[:tag].upcase, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], query[:idType].to_i, query[:tagType], current_date]
         end
       end
-      puts "[append_to_combined_csv] CSV file 'all_trends_data.csv' updated successfully."
+      puts "[append_to_combined_csv] CSV file '#{combined_filename}' updated successfully."
     rescue => e
-      puts "[append_to_combined_csv] Error writing to combined CSV file 'all_trends_data.csv': #{e.message}"
+      puts "[append_to_combined_csv] Error writing to combined CSV file '#{combined_filename}': #{e.message}"
     end
   end
 
@@ -224,89 +229,103 @@ class GoogleTrendsScraper
       return
     end
 
-    filepath = Rails.root.join('public', filename) # Save file in the public directory
-    current_date = Date.today.strftime('%Y-%m-%d') # Get current date in YYYY-MM-DD format
+    filepath = Rails.root.join('public', filename)
+    current_date = Date.today.strftime('%Y-%m-%d')
 
     begin
-      CSV.open(filepath, "wb") do |csv|
-        csv << ["Query", "Line Number", "Seed", "Link", "Rising Value", "Date"] # Add "Date" column
+      CSV.open(filepath, "wb", headers: true) do |csv|
+        csv << ["Query", "Line Number", "Seed", "Link", "Rising Value", "idType", "tagType", "Date"]
         data.each do |entry|
-          csv << [query, entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], current_date]
+          csv << [query[:tag], entry[:line_number], entry[:seed].capitalize, "https://trends.google.ca#{entry[:link]}", entry[:rising_value], query[:idType].to_i, query[:tagType], current_date]
         end
       end
       puts "[write_to_csv] CSV file '#{filename}' written successfully."
+
+      # Immediately add the written CSV to the zip file
+      add_to_zip_file(query)
+
     rescue => e
       puts "[write_to_csv] Error writing CSV file '#{filename}': #{e.message}"
     end
   end
 
-
-  # Main method to fetch and export trends
-  
-  def fetch_and_export_trends(queries, pick_date, max_pages = 5)
+  def fetch_and_export_trends(queries, pick_date = '201-d', max_pages = 5)
     options = Selenium::WebDriver::Chrome::Options.new
     user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36'
     options.add_argument("user-agent=#{user_agent}")
-
-    @driver = Selenium::WebDriver.for :chrome, options: options
-    @wait = Selenium::WebDriver::Wait.new(timeout: 20)
-
+  
     successful_scrapes = 0
     unsuccessful_scrapes = 0
-
+  
+    # Iterate over the queries in batches
     queries.each_slice(rand(5..8)).with_index do |query_batch, index|
+      # Open a new browser instance for each batch of queries
+      @driver = Selenium::WebDriver.for :chrome, options: options
+      @wait = Selenium::WebDriver::Wait.new(timeout: 20)
+  
       query_batch.each do |query|
-        filename = "#{query.parameterize}.csv"
+        filename = "#{query[:tag].parameterize}.csv"
         data = fetch_trends_pages(@driver, @wait, query, pick_date, max_pages)
-
+  
         if data.any?
           successful_scrapes += 1
           write_to_csv(data, filename, query)
           append_to_combined_csv(data, query)
-          puts "[fetch_and_export_trends] Data written to CSV for query: #{query}."
+          puts "[fetch_and_export_trends] Data written to CSV for query: #{query[:tag]}."
         else
           unsuccessful_scrapes += 1
-          puts "[fetch_and_export_trends] No data found to write to the CSV for query: #{query}."
+          puts "[fetch_and_export_trends] No data found to write to the CSV for query: #{query[:tag]}."
         end
       end
-
-      if (index + 1) < (queries.size / query_batch.size.to_f).ceil
-
-        # Execute the AppleScript to change the VPN location
-        change_vpn_location
-
-        @driver.navigate.refresh
-
-        @driver.execute_script("window.open('about:blank', '_blank');")
-
-        new_tab_handle = @driver.window_handles.last
-        old_tab_handle = @driver.window_handles.first
-
-        @driver.switch_to.window(new_tab_handle)
-
-        if old_tab_handle != new_tab_handle
-          @driver.switch_to.window(old_tab_handle)
-          @driver.close
-        end
-        @driver.switch_to.window(new_tab_handle)
-      end
+  
+      # Close the current browser
+      @driver.quit
+      puts "[fetch_and_export_trends] Browser closed after batch #{index + 1}."
+  
+      # Change VPN location before opening a new browser instance
+      change_vpn_location
+  
+      puts "[fetch_and_export_trends] Opening new browser for next batch."
     end
-
-    @driver.quit
-    create_zip_from_csv_files(queries)
+  
     puts "[fetch_and_export_trends] Total successful scrapes: #{successful_scrapes}"
     puts "[fetch_and_export_trends] Total unsuccessful scrapes: #{unsuccessful_scrapes}"
   end
-
+  
   # Method to change VPN location by running the AppleScript
   def change_vpn_location
     begin
       puts "[change_vpn_location] Changing VPN location..."
       # Assuming your AppleScript is saved as change_vpn_location.scpt in the project root
       system("osascript #{Rails.root.join('location_handler.scpt')}")
+
+      sleep(2)
+
       puts "[change_vpn_location] VPN location changed successfully."
+
+
+      # Fetch and print the current public IP address
+      current_ip = fetch_current_ip
+      puts "[change_vpn_location] Current IP address: #{current_ip}"
+
     rescue => e
       puts "[change_vpn_location] Error changing VPN location: #{e.message}"
     end
   end
+
+    # Helper method to fetch the current public IP address
+    def fetch_current_ip
+      begin
+        uri = URI.parse("https://api.ipify.org")
+        response = Net::HTTP.get_response(uri)
+        if response.is_a?(Net::HTTPSuccess)
+          response.body
+        else
+          "Unable to fetch IP address"
+        end
+      rescue => e
+        "Error fetching IP address: #{e.message}"
+      end
+    end
+
 end

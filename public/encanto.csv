@@ -1,3 +1,20 @@
-Query,Line Number,Seed,Link,Rising Value,Date
- Encanto,1,Encanto movie,https://trends.google.ca/trends/explore?q=encanto+movie&date=now+1-d&geo=CA,+70%,2024-10-01
- Encanto,2,Encanto characters,https://trends.google.ca/trends/explore?q=encanto+characters&date=now+1-d&geo=CA,+70%,2024-10-01
+Query,Line Number,Seed,Link,Rising Value,idType,tagType,Date
+Encanto,1,Encanto fire,https://trends.google.ca/trends/explore?q=encanto+fire&date=now+1-d&geo=US,Breakout,154,Movie,2024-10-02
+Encanto,2,Lin-manuel miranda,https://trends.google.ca/trends/explore?q=lin-manuel+miranda&date=now+1-d&geo=US,Breakout,154,Movie,2024-10-02
+Encanto,3,Dolores from encanto,https://trends.google.ca/trends/explore?q=dolores+from+encanto&date=now+1-d&geo=US,Breakout,154,Movie,2024-10-02
+Encanto,4,Encanto soundtrack youtube,https://trends.google.ca/trends/explore?q=encanto+soundtrack+youtube&date=now+1-d&geo=US,Breakout,154,Movie,2024-10-02
+Encanto,5,Disney princesses,https://trends.google.ca/trends/explore?q=disney+princesses&date=now+1-d&geo=US,Breakout,154,Movie,2024-10-02
+Encanto,6,Encanto instrumental,https://trends.google.ca/trends/explore?q=encanto+instrumental&date=now+1-d&geo=US,Breakout,154,Movie,2024-10-02
+Encanto,7,Encanto pico,https://trends.google.ca/trends/explore?q=encanto+pico&date=now+1-d&geo=US,Breakout,154,Movie,2024-10-02
+Encanto,8,Encanto family tree,https://trends.google.ca/trends/explore?q=encanto+family+tree&date=now+1-d&geo=US,+200%,154,Movie,2024-10-02
+Encanto,9,Bruno madrigal,https://trends.google.ca/trends/explore?q=bruno+madrigal&date=now+1-d&geo=US,+200%,154,Movie,2024-10-02
+Encanto,10,Encanto fanfiction mirabel runs away,https://trends.google.ca/trends/explore?q=encanto+fanfiction+mirabel+runs+away&date=now+1-d&geo=US,+170%,154,Movie,2024-10-02
+Encanto,11,Encanto grandma,https://trends.google.ca/trends/explore?q=encanto+grandma&date=now+1-d&geo=US,+160%,154,Movie,2024-10-02
+Encanto,12,Encanto restaurante,https://trends.google.ca/trends/explore?q=encanto+restaurante&date=now+1-d&geo=US,+150%,154,Movie,2024-10-02
+Encanto,13,Casita encanto,https://trends.google.ca/trends/explore?q=casita+encanto&date=now+1-d&geo=US,+140%,154,Movie,2024-10-02
+Encanto,14,Antonio madrigal,https://trends.google.ca/trends/explore?q=antonio+madrigal&date=now+1-d&geo=US,+100%,154,Movie,2024-10-02
+Encanto,15,We don't talk about bruno lyrics encanto english,https://trends.google.ca/trends/explore?q=we+don't+talk+about+bruno+lyrics+encanto+english&date=now+1-d&geo=US,+100%,154,Movie,2024-10-02
+Encanto,16,Encanto golf course,https://trends.google.ca/trends/explore?q=encanto+golf+course&date=now+1-d&geo=US,+90%,154,Movie,2024-10-02
+Encanto,17,Encanto pet clinic,https://trends.google.ca/trends/explore?q=encanto+pet+clinic&date=now+1-d&geo=US,+90%,154,Movie,2024-10-02
+Encanto,18,El encanto santa barbara,https://trends.google.ca/trends/explore?q=el+encanto+santa+barbara&date=now+1-d&geo=US,+60%,154,Movie,2024-10-02
+Encanto,19,Encanto restaurant,https://trends.google.ca/trends/explore?q=encanto+restaurant&date=now+1-d&geo=US,+50%,154,Movie,2024-10-02

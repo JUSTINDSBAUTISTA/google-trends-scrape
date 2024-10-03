@@ -1,20 +1,13 @@
-Query,Line Number,Seed,Link,Rising Value,Date
- Friends,1,Kenny friends south park,https://trends.google.ca/trends/explore?q=kenny+friends+south+park&date=now+7-d&geo=CA,Breakout,2024-10-01
- Friends,2,Make amends,https://trends.google.ca/trends/explore?q=make+amends&date=now+7-d&geo=CA,Breakout,2024-10-01
- Friends,3,Mountain bike brands,https://trends.google.ca/trends/explore?q=mountain+bike+brands&date=now+7-d&geo=CA,Breakout,2024-10-01
- Friends,4,Southpark friends,https://trends.google.ca/trends/explore?q=southpark+friends&date=now+7-d&geo=CA,Breakout,2024-10-01
- Friends,5,Mission for a scout for short,https://trends.google.ca/trends/explore?q=mission+for+a+scout+for+short&date=now+7-d&geo=CA,"+4,500%",2024-10-01
- Friends,6,Make amends nyt,https://trends.google.ca/trends/explore?q=make+amends+nyt&date=now+7-d&geo=CA,"+4,000%",2024-10-01
- Friends,7,South park characters,https://trends.google.ca/trends/explore?q=south+park+characters&date=now+7-d&geo=CA,"+3,850%",2024-10-01
- Friends,8,Jewel friends,https://trends.google.ca/trends/explore?q=jewel+friends&date=now+7-d&geo=CA,"+1,600%",2024-10-01
- Friends,9,South park friends,https://trends.google.ca/trends/explore?q=south+park+friends&date=now+7-d&geo=CA,"+1,600%",2024-10-01
- Friends,10,South park,https://trends.google.ca/trends/explore?q=south+park&date=now+7-d&geo=CA,"+1,350%",2024-10-01
- Friends,11,South park cast,https://trends.google.ca/trends/explore?q=south+park+cast&date=now+7-d&geo=CA,"+1,300%",2024-10-01
- Friends,12,Alternative to yahoo or aol,https://trends.google.ca/trends/explore?q=alternative+to+yahoo+or+aol&date=now+7-d&geo=CA,"+1,250%",2024-10-01
- Friends,13,South park friends list,https://trends.google.ca/trends/explore?q=south+park+friends+list&date=now+7-d&geo=CA,+450%,2024-10-01
- Friends,14,Friends of kananaskis,https://trends.google.ca/trends/explore?q=friends+of+kananaskis&date=now+7-d&geo=CA,+400%,2024-10-01
- Friends,15,Charlie brown friends,https://trends.google.ca/trends/explore?q=charlie+brown+friends&date=now+7-d&geo=CA,+300%,2024-10-01
- Friends,16,Cd,https://trends.google.ca/trends/explore?q=cd&date=now+7-d&geo=CA,+300%,2024-10-01
- Friends,17,National best friends day,https://trends.google.ca/trends/explore?q=national+best+friends+day&date=now+7-d&geo=CA,+170%,2024-10-01
- Friends,18,Dermot mulroney,https://trends.google.ca/trends/explore?q=dermot+mulroney&date=now+7-d&geo=CA,+120%,2024-10-01
- Friends,19,Best friends whenever,https://trends.google.ca/trends/explore?q=best+friends+whenever&date=now+7-d&geo=CA,+110%,2024-10-01
+Query,Line Number,Seed,Link,Rising Value,idType,tagType,Date
+Friends,1,Friends with school shooters,https://trends.google.ca/trends/explore?q=friends+with+school+shooters&date=now+1-d&geo=US,Breakout,216,TV Show,2024-10-02
+Friends,2,Walz friends with school shooters,https://trends.google.ca/trends/explore?q=walz+friends+with+school+shooters&date=now+1-d&geo=US,Breakout,216,TV Show,2024-10-02
+Friends,3,Tim walz friends with school shooters,https://trends.google.ca/trends/explore?q=tim+walz+friends+with+school+shooters&date=now+1-d&geo=US,Breakout,216,TV Show,2024-10-02
+Friends,4,Walz friends with school shooter,https://trends.google.ca/trends/explore?q=walz+friends+with+school+shooter&date=now+1-d&geo=US,Breakout,216,TV Show,2024-10-02
+Friends,5,Ive become friends with school shooters,https://trends.google.ca/trends/explore?q=ive+become+friends+with+school+shooters&date=now+1-d&geo=US,Breakout,216,TV Show,2024-10-02
+Friends,6,Waltz friends with school shooters,https://trends.google.ca/trends/explore?q=waltz+friends+with+school+shooters&date=now+1-d&geo=US,Breakout,216,TV Show,2024-10-02
+Friends,7,I've become friends with school shooters,https://trends.google.ca/trends/explore?q=i've+become+friends+with+school+shooters&date=now+1-d&geo=US,Breakout,216,TV Show,2024-10-02
+Friends,8,Walz friends with school shooters cnn,https://trends.google.ca/trends/explore?q=walz+friends+with+school+shooters+cnn&date=now+1-d&geo=US,Breakout,216,TV Show,2024-10-02
+Friends,9,Tim walz friends with school shooter,https://trends.google.ca/trends/explore?q=tim+walz+friends+with+school+shooter&date=now+1-d&geo=US,Breakout,216,TV Show,2024-10-02
+Friends,10,Im friends with school shooters,https://trends.google.ca/trends/explore?q=im+friends+with+school+shooters&date=now+1-d&geo=US,Breakout,216,TV Show,2024-10-02
+Friends,11,Tim walz friends with school shooters cnn,https://trends.google.ca/trends/explore?q=tim+walz+friends+with+school+shooters+cnn&date=now+1-d&geo=US,Breakout,216,TV Show,2024-10-02
+Friends,12,I became friends with school shooters,https://trends.google.ca/trends/explore?q=i+became+friends+with+school+shooters&date=now+1-d&geo=US,Breakout,216,TV Show,2024-10-02

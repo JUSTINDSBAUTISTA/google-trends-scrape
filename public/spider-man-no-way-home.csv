@@ -1,4 +1,5 @@
-Query,Line Number,Seed,Link,Rising Value,Date
- Spider-Man: No Way Home,1,The amazing spider-man 2,https://trends.google.ca/trends/explore?q=the+amazing+spider-man+2&date=now+7-d&geo=CA,Breakout,2024-10-01
- Spider-Man: No Way Home,2,Jake gyllenhaal,https://trends.google.ca/trends/explore?q=jake+gyllenhaal&date=now+7-d&geo=CA,Breakout,2024-10-01
- Spider-Man: No Way Home,3,Spider-man far from home,https://trends.google.ca/trends/explore?q=spider-man+far+from+home&date=now+7-d&geo=CA,+50%,2024-10-01
+Query,Line Number,Seed,Link,Rising Value,idType,tagType,Date
+Spider-Man: No Way Home,1,Where can i watch spider-man no way home,https://trends.google.ca/trends/explore?q=where+can+i+watch+spider-man+no+way+home&date=now+1-d&geo=US,Breakout,154,Movie,2024-10-02
+Spider-Man: No Way Home,2,Deadpool and wolverine,https://trends.google.ca/trends/explore?q=deadpool+and+wolverine&date=now+1-d&geo=US,Breakout,154,Movie,2024-10-02
+Spider-Man: No Way Home,3,Spider-man no way home trailer,https://trends.google.ca/trends/explore?q=spider-man+no+way+home+trailer&date=now+1-d&geo=US,+130%,154,Movie,2024-10-02
+Spider-Man: No Way Home,4,Watch spider-man no way home,https://trends.google.ca/trends/explore?q=watch+spider-man+no+way+home&date=now+1-d&geo=US,+70%,154,Movie,2024-10-02

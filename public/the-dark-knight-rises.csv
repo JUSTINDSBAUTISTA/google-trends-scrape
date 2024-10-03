@@ -1,4 +1,5 @@
-Query,Line Number,Seed,Link,Rising Value,Date
- The Dark Knight Rises,1,The dark knight rises cast bane,https://trends.google.ca/trends/explore?q=the+dark+knight+rises+cast+bane&date=now+1-d&geo=CA,,2024-10-01
- The Dark Knight Rises,2,Cast of the dark knight rises,https://trends.google.ca/trends/explore?q=cast+of+the+dark+knight+rises&date=now+1-d&geo=CA,,2024-10-01
- The Dark Knight Rises,3,Batman begins,https://trends.google.ca/trends/explore?q=batman+begins&date=now+1-d&geo=CA,,2024-10-01
+Query,Line Number,Seed,Link,Rising Value,idType,tagType,Date
+The Dark Knight Rises,1,Tom hardy,https://trends.google.ca/trends/explore?q=tom+hardy&date=now+1-d&geo=US,+70%,154,Movie,2024-10-02
+The Dark Knight Rises,2,The dark knight rises cast bane,https://trends.google.ca/trends/explore?q=the+dark+knight+rises+cast+bane&date=now+1-d&geo=US,+70%,154,Movie,2024-10-02
+The Dark Knight Rises,3,Who played bane in the dark knight rises,https://trends.google.ca/trends/explore?q=who+played+bane+in+the+dark+knight+rises&date=now+1-d&geo=US,+70%,154,Movie,2024-10-02
+The Dark Knight Rises,4,The dark knight rises cast joker,https://trends.google.ca/trends/explore?q=the+dark+knight+rises+cast+joker&date=now+1-d&geo=US,+50%,154,Movie,2024-10-02

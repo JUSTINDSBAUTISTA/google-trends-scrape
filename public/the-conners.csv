@@ -1,4 +1,7 @@
-Query,Line Number,Seed,Link,Rising Value,Date
- The Conners,1,Sara gilbert,https://trends.google.ca/trends/explore?q=sara+gilbert&date=now+1-d&geo=CA,+250%,2024-10-01
- The Conners,2,The conners episodes,https://trends.google.ca/trends/explore?q=the+conners+episodes&date=now+1-d&geo=CA,+120%,2024-10-01
- The Conners,3,Cast of the conners,https://trends.google.ca/trends/explore?q=cast+of+the+conners&date=now+1-d&geo=CA,+60%,2024-10-01
+Query,Line Number,Seed,Link,Rising Value,idType,tagType,Date
+The Conners,1,Is the conners canceled,https://trends.google.ca/trends/explore?q=is+the+conners+canceled&date=now+1-d&geo=US,Breakout,216,TV Show,2024-10-02
+The Conners,2,Why is roseanne not on the conners,https://trends.google.ca/trends/explore?q=why+is+roseanne+not+on+the+conners&date=now+1-d&geo=US,+130%,216,TV Show,2024-10-02
+The Conners,3,When is the conners coming back,https://trends.google.ca/trends/explore?q=when+is+the+conners+coming+back&date=now+1-d&geo=US,+60%,216,TV Show,2024-10-02
+The Conners,4,Was roseanne on the conners,https://trends.google.ca/trends/explore?q=was+roseanne+on+the+conners&date=now+1-d&geo=US,+50%,216,TV Show,2024-10-02
+The Conners,5,Roseanne cast,https://trends.google.ca/trends/explore?q=roseanne+cast&date=now+1-d&geo=US,+50%,216,TV Show,2024-10-02
+The Conners,6,How did roseanne die on the conners,https://trends.google.ca/trends/explore?q=how+did+roseanne+die+on+the+conners&date=now+1-d&geo=US,+50%,216,TV Show,2024-10-02
