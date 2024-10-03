@@ -1,5 +1,10 @@
 # config/routes.rb
+require 'sidekiq/web'
+
 Rails.application.routes.draw do
+  # Sidekiq Web UI for monitoring jobs (only enable in development or if properly secured)
+  mount Sidekiq::Web => '/sidekiq'
+
   resources :trends, only: [:index] do
     collection do
       post :fetch_trends
