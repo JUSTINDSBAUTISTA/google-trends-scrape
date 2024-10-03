@@ -1,0 +1,5 @@
+# config/sidekiq.yml
+---
+:concurrency: 5  # You want 10 workers
+:queues:
+  - default
