@@ -258,7 +258,7 @@ class GoogleTrendsScraper
     unsuccessful_scrapes = 0
   
     # Iterate over the queries in batches
-    queries.each_slice(rand(5..8)).with_index do |query_batch, index|
+    queries.each_slice(rand(6..9)).with_index do |query_batch, index|
       # Open a new browser instance for each batch of queries
       @driver = Selenium::WebDriver.for :chrome, options: options
       @wait = Selenium::WebDriver::Wait.new(timeout: 20)
